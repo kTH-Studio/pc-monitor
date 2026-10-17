@@ -1,0 +1,12 @@
+#  PC Monitor v.5.0 — библиотеки Arduino IDE
+#  Установить через Library Manager
+
+U8g2
+Adafruit BME280 Library
+Adafruit Unified Sensor
+ArduinoJson@^7.0.0
+ESPAsyncWebServer
+AsyncTCP
+
+#  Плагин для загрузки веб-файлов в LittleFS:
+#  https://github.com/earlephilhower/arduino-littlefs-upload/releases

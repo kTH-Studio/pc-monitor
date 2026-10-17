@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PC Monitor — Settings</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- НАВИГАЦИЯ -->
+<nav class="nav">
+    <div class="nav__brand">
+        <span class="nav__heart">♥</span>
+        <span>PC Monitor v.5.0</span>
+        <span id="conn-status" style="margin-left:8px;">○</span>
+    </div>
+    <button class="nav__hamburger" id="nav-hamburger">☰</button>
+    <div class="nav__links" id="nav-links">
+        <a href="index.html">Dashboard</a>
+        <a href="settings.html">Settings</a>
+        <a href="control.html">Control</a>
+        <a href="pages.html">Pages</a>
+        <a href="buttons.html">Buttons</a>
+        <a href="ota.html">OTA</a>
+        <a href="logs.html">Logs</a>
+    </div>
+</nav>
+
+<main class="container">
+
+    <div class="grid grid--2">
+
+        <!-- ЛЕВАЯ КОЛОНКА -->
+        <!-- WiFi -->
+        <section class="panel" id="panel-wifi">
+            <h2 class="panel__title">WiFi</h2>
+
+            <div class="panel__row">
+                <span class="key">Статус</span>
+                <span class="val" id="wifi-status">--</span>
+            </div>
+
+            <div class="form-row">
+                <label>SSID</label>
+                <input type="text" id="wifi-ssid" placeholder="название сети">
+            </div>
+
+            <div class="form-row">
+                <label>Пароль</label>
+                <input type="password" id="wifi-pass" placeholder="пароль">
+            </div>
+
+            <div class="mt-8">
+                <button class="btn btn--small" id="btn-wifi-scan">Сканировать</button>
+                <button class="btn btn--small btn--green" id="btn-wifi-save">Сохранить</button>
+                <button class="btn btn--small btn--red" id="btn-wifi-clear">Сбросить</button>
+            </div>
+
+            <div id="wifi-scan-result" class="mt-8 hidden">
+                <div class="text-dim mb-8">Найденные сети:</div>
+                <div id="wifi-networks"></div>
+            </div>
+        </section>
+
+        <!-- Отображение -->
+        <section class="panel" id="panel-display">
+            <h2 class="panel__title">Отображение</h2>
+
+            <div class="form-row">
+                <label>Язык</label>
+                <select id="set-lang">
+                    <option value="1">Русский</option>
+                    <option value="0">English</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label>Яркость OLED</label>
+                <input type="range" id="set-brightness" min="1" max="100" value="100">
+                <span class="val" id="brightness-val">100%</span>
+            </div>
+
+            <div class="form-row">
+                <label>Яркость ночью</label>
+                <input type="range" id="set-night-bright" min="1" max="100" value="1">
+                <span class="val" id="night-bright-val">1%</span>
+            </div>
+        </section>
+
+        <!-- Ночной режим -->
+        <section class="panel" id="panel-night">
+            <h2 class="panel__title">Ночной режим</h2>
+
+            <div class="form-row">
+                <label>Режим</label>
+                <select id="set-night-mode">
+                    <option value="0">Выкл</option>
+                    <option value="1">Вручную</option>
+                    <option value="2">По времени</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label>Включение (час)</label>
+                <input type="number" id="set-night-on" min="0" max="23" value="23">
+            </div>
+
+            <div class="form-row">
+                <label>Выключение (час)</label>
+                <input type="number" id="set-night-off" min="0" max="23" value="7">
+            </div>
+
+            <div class="text-dim mt-8" style="font-size:12px;">
+                Если вкл &lt; выкл — работает в этом интервале.<br>
+                Если вкл &gt; выкл — через полночь (например, 23 → 7).
+            </div>
+        </section>
+
+        <!-- Тайминги -->
+        <section class="panel" id="panel-timings">
+            <h2 class="panel__title">Тайминги</h2>
+
+            <div class="form-row">
+                <label>Нотификация (сек)</label>
+                <input type="number" id="set-notify-ms" min="1" max="60" value="5">
+            </div>
+
+            <div class="form-row">
+                <label>Медиа на паузе (сек)</label>
+                <input type="number" id="set-media-ms" min="1" max="120" value="10">
+            </div>
+
+            <div class="form-row">
+                <label>Подтверждение питания (сек)</label>
+                <input type="number" id="set-power-ms" min="1" max="60" value="5">
+            </div>
+        </section>
+
+        <!-- ПРАВАЯ КОЛОНКА -->
+        <!-- Пороги -->
+        <section class="panel" id="panel-thresholds">
+            <h2 class="panel__title">Пороги (для LED и уведомлений)</h2>
+
+            <div class="form-row">
+                <label>GPU temp (°C)</label>
+                <input type="number" id="thr-gpu" min="30" max="120" value="85">
+            </div>
+            <div class="form-row">
+                <label>CPU temp (°C)</label>
+                <input type="number" id="thr-cpu" min="30" max="120" value="90">
+            </div>
+            <div class="form-row">
+                <label>RAM (%)</label>
+                <input type="number" id="thr-ram" min="30" max="100" value="90">
+            </div>
+            <div class="form-row">
+                <label>Диск (%)</label>
+                <input type="number" id="thr-disk" min="30" max="100" value="90">
+            </div>
+            <div class="form-row">
+                <label>Пинг (ms)</label>
+                <input type="number" id="thr-ping" min="10" max="2000" value="200">
+            </div>
+            <div class="form-row">
+                <label>Утечка (MB)</label>
+                <input type="number" id="thr-leak" min="10" max="10000" value="500">
+            </div>
+        </section>
+
+        <!-- Пинг-цели -->
+        <section class="panel" id="panel-ping">
+            <h2 class="panel__title">Пинг-цели (до 5)</h2>
+
+            <div id="ping-targets"></div>
+        </section>
+
+        <!-- Медиа-приоритет -->
+        <section class="panel" id="panel-media">
+            <h2 class="panel__title">Медиа — приоритет источников</h2>
+
+            <div class="form-row">
+                <label>Список (через ;)</label>
+                <input type="text" id="set-media-prio"
+                       placeholder="Spotify;YouTube;VLC;Browser">
+            </div>
+
+            <div class="text-dim mt-8" style="font-size:12px;">
+                Первое совпадение из списка будет выбрано, если играет
+                несколько источников одновременно.
+            </div>
+        </section>
+
+        <!-- ESP32 -->
+        <section class="panel" id="panel-esp">
+            <h2 class="panel__title">ESP32</h2>
+
+            <div class="panel__row">
+                <span class="key">Uptime</span>
+                <span class="val" id="esp-uptime">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Heap</span>
+                <span class="val" id="esp-heap">--</span>
+            </div>
+
+            <div class="mt-16">
+                <button class="btn btn--block btn--orange" id="btn-esp-restart">
+                    Перезагрузить ESP32
+                </button>
+                <button class="btn btn--block btn--red" id="btn-esp-reset">
+                    Сбросить настройки
+                </button>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- КНОПКА СОХРАНЕНИЯ -->
+    <div class="mt-16" style="position: sticky; bottom: 16px;">
+        <button class="btn btn--green btn--block" id="btn-save">
+            СОХРАНИТЬ ВСЁ
+        </button>
+    </div>
+
+</main>
+
+<footer class="footer">
+    <span class="footer__heart">♥</span> by KTH-Studio
+</footer>
+
+<script src="script.js"></script>
+<script>
+'use strict';
+
+//  Загрузка настроек
+async function loadSettings() {
+    const r = await PCM.apiGet('/api/settings');
+    if (!r.ok) {
+        PCM.showToast('Ошибка загрузки настроек');
+        return;
+    }
+    const d = r.data;
+
+    // WiFi
+    PCM.setText('wifi-status', d.wifi.ap ? 'AP-режим' : (d.wifi.has ? 'STA' : 'не настроено'));
+    document.getElementById('wifi-ssid').value = d.wifi.ssid || '';
+
+    // Отображение
+    document.getElementById('set-lang').value = d.lang ?? 1;
+    document.getElementById('set-brightness').value = d.brightness ?? 100;
+    document.getElementById('brightness-val').textContent = (d.brightness ?? 100) + '%';
+
+    document.getElementById('set-night-bright').value = d.night_bright ?? 1;
+    document.getElementById('night-bright-val').textContent = (d.night_bright ?? 1) + '%';
+
+    // Ночной
+    document.getElementById('set-night-mode').value = d.night_mode ?? 0;
+    document.getElementById('set-night-on').value = d.night_on ?? 23;
+    document.getElementById('set-night-off').value = d.night_off ?? 7;
+
+    // Тайминги (в API — мс, в UI — сек)
+    document.getElementById('set-notify-ms').value = Math.round((d.notify_ms ?? 5000) / 1000);
+    document.getElementById('set-media-ms').value = Math.round((d.media_ms ?? 10000) / 1000);
+    document.getElementById('set-power-ms').value = Math.round((d.power_ms ?? 5000) / 1000);
+
+    // Пороги
+    if (d.thresholds) {
+        document.getElementById('thr-gpu').value = d.thresholds.gpu_temp ?? 85;
+        document.getElementById('thr-cpu').value = d.thresholds.cpu_temp ?? 90;
+        document.getElementById('thr-ram').value = d.thresholds.ram_pct ?? 90;
+        document.getElementById('thr-disk').value = d.thresholds.disk_pct ?? 90;
+        document.getElementById('thr-ping').value = d.thresholds.ping_ms ?? 200;
+        document.getElementById('thr-leak').value = d.thresholds.leak_mb ?? 500;
+    }
+
+    // Пинг-цели
+    renderPingTargets(d.ping || []);
+
+    // Медиа
+    document.getElementById('set-media-prio').value = d.media_prio || '';
+}
+
+//  Пинг-цели — рисование
+const DEFAULT_PING = [
+    { name: 'Google',     host: '8.8.8.8' },
+    { name: 'Яндекс',     host: '77.88.55.88' },
+    { name: 'Роутер',     host: '192.168.1.1' },
+    { name: 'Cloudflare', host: '1.1.1.1' },
+    { name: 'Quad9',      host: '9.9.9.9' },
+];
+
+function renderPingTargets(targets) {
+    const el = document.getElementById('ping-targets');
+    let html = '';
+    for (let i = 0; i < 5; i++) {
+        const t = targets[i] || DEFAULT_PING[i] || { name: '', host: '' };
+        html += `
+            <div class="form-row" style="flex-wrap:wrap;">
+                <label style="flex:0 0 40px;">#${i + 1}</label>
+                <input type="text" class="ping-name" data-i="${i}"
+                       placeholder="имя" value="${PCM.esc(t.name)}"
+                       style="max-width:120px;">
+                <input type="text" class="ping-host" data-i="${i}"
+                       placeholder="host" value="${PCM.esc(t.host)}"
+                       style="max-width:160px;">
+            </div>
+        `;
+    }
+    el.innerHTML = html;
+}
+
+function getPingTargets() {
+    const result = [];
+    for (let i = 0; i < 5; i++) {
+        const nameEl = document.querySelector(`.ping-name[data-i="${i}"]`);
+        const hostEl = document.querySelector(`.ping-host[data-i="${i}"]`);
+        const name = nameEl ? nameEl.value.trim() : '';
+        const host = hostEl ? hostEl.value.trim() : '';
+        result.push({ name, host });
+    }
+    return result;
+}
+
+//  Сканирование WiFi
+async function scanWifi() {
+    const el = document.getElementById('wifi-scan-result');
+    el.classList.remove('hidden');
+    document.getElementById('wifi-networks').innerHTML =
+        '<div class="text-dim">сканирую...</div>';
+
+    const r = await PCM.apiGet('/api/wifi/scan');
+    if (!r.ok) {
+        document.getElementById('wifi-networks').innerHTML =
+            '<div class="text-red">ошибка сканирования</div>';
+        return;
+    }
+
+    const nets = (r.data.networks || []).sort((a, b) => b.rssi - a.rssi);
+    if (!nets.length) {
+        document.getElementById('wifi-networks').innerHTML =
+            '<div class="text-dim">сети не найдены</div>';
+        return;
+    }
+
+    let html = '';
+    for (const n of nets) {
+        const lock = n.enc ? '🔒' : '  ';
+        html += `
+            <div class="panel__row" style="cursor:pointer; padding:4px 0;"
+                 onclick="selectWifi('${PCM.esc(n.ssid)}')">
+                <span class="key">${PCM.esc(n.ssid)}</span>
+                <span class="val ${n.rssi > -60 ? 'text-green' : (n.rssi > -80 ? 'text-orange' : 'text-red')}">
+                    ${lock} ${n.rssi}dBm
+                </span>
+            </div>
+        `;
+    }
+    document.getElementById('wifi-networks').innerHTML = html;
+}
+
+function selectWifi(ssid) {
+    document.getElementById('wifi-ssid').value = ssid;
+    document.getElementById('wifi-pass').focus();
+}
+
+//  Сохранение
+async function saveSettings() {
+    const btn = document.getElementById('btn-save');
+    btn.disabled = true;
+    btn.textContent = 'СОХРАНЯЮ...';
+
+    const payload = {
+        lang:          Number(document.getElementById('set-lang').value),
+        brightness:    Number(document.getElementById('set-brightness').value),
+        night_bright:  Number(document.getElementById('set-night-bright').value),
+        night_mode:    Number(document.getElementById('set-night-mode').value),
+        night_on:      Number(document.getElementById('set-night-on').value),
+        night_off:     Number(document.getElementById('set-night-off').value),
+        notify_ms:     Number(document.getElementById('set-notify-ms').value) * 1000,
+        media_ms:      Number(document.getElementById('set-media-ms').value) * 1000,
+        power_ms:      Number(document.getElementById('set-power-ms').value) * 1000,
+        media_prio:    document.getElementById('set-media-prio').value.trim(),
+        thresholds: {
+            gpu_temp: Number(document.getElementById('thr-gpu').value),
+            cpu_temp: Number(document.getElementById('thr-cpu').value),
+            ram_pct:  Number(document.getElementById('thr-ram').value),
+            disk_pct: Number(document.getElementById('thr-disk').value),
+            ping_ms:  Number(document.getElementById('thr-ping').value),
+            leak_mb:  Number(document.getElementById('thr-leak').value),
+        },
+        ping: getPingTargets(),
+    };
+
+    // WiFi — только если ввели
+    const ssid = document.getElementById('wifi-ssid').value.trim();
+    const pass = document.getElementById('wifi-pass').value;
+    if (ssid && pass) {
+        payload.wifi = { ssid, pass };
+    }
+
+    const r = await PCM.apiPost('/api/settings', payload);
+
+    btn.disabled = false;
+    btn.textContent = 'СОХРАНИТЬ ВСЁ';
+
+    if (r.ok) {
+        PCM.showToast('✓ Сохранено');
+        // Если поменяли WiFi — предупредим
+        if (payload.wifi) {
+            PCM.showToast('WiFi изменён. ESP перезагрузится.');
+        }
+    } else {
+        PCM.showToast('✗ Ошибка сохранения');
+    }
+}
+
+//  Сброс WiFi
+function clearWifi() {
+    PCM.showConfirm(
+        'СБРОС WIFI',
+        'ESP32 забудет сеть и перезагрузится в режим AP. Продолжить?',
+        async () => {
+            const r = await PCM.apiPost('/api/control', { action: 'wifi_clear' });
+            if (r.ok) {
+                PCM.showToast('WiFi сброшен. ESP перезагружается...');
+            }
+        }
+    );
+}
+
+//  Перезагрузка / сброс ESP
+function restartEsp() {
+    PCM.showConfirm(
+        'ПЕРЕЗАГРУЗКА ESP32',
+        'Устройство перезагрузится. Продолжить?',
+        async () => {
+            await PCM.apiPost('/api/control', { action: 'esp_restart' });
+        }
+    );
+}
+
+function resetEsp() {
+    PCM.showConfirm(
+        'СБРОС НАСТРОЕК',
+        'ВСЕ настройки будут сброшены к заводским. Продолжить?',
+        async () => {
+            await PCM.apiPost('/api/control', { action: 'esp_reset' });
+            PCM.showToast('Настройки сброшены. Перезагрузите ESP.');
+        }
+    );
+}
+
+//  Обновление статуса ESP
+async function loadStatus() {
+    const r = await PCM.apiGet('/api/status');
+    if (!r.ok) return;
+    const d = r.data;
+    PCM.setText('esp-uptime', PCM.fmtUptime(d.uptime));
+    PCM.setText('esp-heap', d.heap ? Math.round(d.heap / 1024) + ' KB' : '--');
+
+    const statusEl = document.getElementById('wifi-status');
+    if (statusEl && !document.getElementById('wifi-ssid').value) {
+        statusEl.textContent = d.ap ? 'AP-режим' : (d.ssid ? 'STA: ' + d.ssid : 'не настроено');
+    }
+}
+
+//  Инициализация
+document.addEventListener('DOMContentLoaded', () => {
+    loadSettings();
+    loadStatus();
+    setInterval(loadStatus, 5000);
+
+    // Слайдеры — живое отображение
+    PCM.bindSlider('set-brightness', v => {
+        document.getElementById('brightness-val').textContent = v + '%';
+    });
+    PCM.bindSlider('set-night-bright', v => {
+        document.getElementById('night-bright-val').textContent = v + '%';
+    });
+
+    // Кнопки
+    document.getElementById('btn-wifi-scan').onclick = scanWifi;
+    document.getElementById('btn-wifi-save').onclick = saveSettings;
+    document.getElementById('btn-wifi-clear').onclick = clearWifi;
+    document.getElementById('btn-esp-restart').onclick = restartEsp;
+    document.getElementById('btn-esp-reset').onclick = resetEsp;
+    document.getElementById('btn-save').onclick = saveSettings;
+});
+</script>
+
+</body>
+</html>

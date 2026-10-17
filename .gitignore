@@ -1,0 +1,75 @@
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Виртуальные окружения
+venv/
+env/
+ENV/
+.venv/
+.env
+
+# ---------- Python: наш проект ----------
+pc/logs/
+pc/*.log
+pc_monitor.log
+*.session
+
+# ---------- Arduino / PlatformIO ----------
+.pio/
+.pioenvs/
+.piolibdeps/
+firmware/.vscode/
+firmware/build/
+firmware/.build/
+firmware/*.bin
+firmware/*.elf
+firmware/*.hex
+firmware/*.map
+firmware/*.d
+firmware/*.o
+firmware/*.ino.bin
+firmware/*.ino.elf
+firmware/*.ino.map
+firmware/*.ino.partitions.bin
+
+# ---------- DLL и бинарники ----------
+LibreHardwareMonitorLib.dll
+LibreHardwareMonitor*.dll
+*.dll
+*.exe
+
+# ---------- Секреты ----------
+secrets.h
+config_local.h
+*.secret
+passwords.txt
+
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- Логи / временные ----------
+*.log
+*.tmp
+*.cache
+.cache/
+
+# ---------- VSCode ----------
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+
+# ---------- Прочее ----------
+*.bak
+*.old
+*.orig

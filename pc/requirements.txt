@@ -1,0 +1,19 @@
+#  PC Monitor v.5.0 — Python зависимости
+#  by KTH-Studio
+
+# Датчики
+psutil>=5.9.0
+pythonnet>=3.0.1
+
+# Связь с ESP
+pyserial>=3.5
+requests>=2.28.0
+
+# Медиа / нотификации (WinRT)
+winsdk>=1.0.0b10
+
+# FPS (RTSS shared memory)
+pywin32>=306
+
+# Утилиты
+colorama>=0.4.6

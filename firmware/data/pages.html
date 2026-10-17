@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PC Monitor — Pages</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- НАВИГАЦИЯ -->
+<nav class="nav">
+    <div class="nav__brand">
+        <span class="nav__heart">♥</span>
+        <span>PC Monitor v.5.0</span>
+        <span id="conn-status" style="margin-left:8px;">○</span>
+    </div>
+    <button class="nav__hamburger" id="nav-hamburger">☰</button>
+    <div class="nav__links" id="nav-links">
+        <a href="index.html">Dashboard</a>
+        <a href="settings.html">Settings</a>
+        <a href="control.html">Control</a>
+        <a href="pages.html">Pages</a>
+        <a href="buttons.html">Buttons</a>
+        <a href="ota.html">OTA</a>
+        <a href="logs.html">Logs</a>
+    </div>
+</nav>
+
+<main class="container">
+
+    <div class="grid grid--2">
+
+        <!--  ЛЕВАЯ КОЛОНКА — Порядок страниц -->
+        <section class="panel">
+            <h2 class="panel__title">Порядок страниц</h2>
+
+            <div class="text-dim mb-16" style="font-size:12px;">
+                Перетащи страницы в нужном порядке. Первая — та, что
+                показывается сразу при запуске.
+            </div>
+
+            <ul class="dnd-list" id="pages-list">
+                <!-- Заполнится JS -->
+            </ul>
+
+            <div class="mt-16">
+                <button class="btn btn--block btn--green" id="btn-save-pages">
+                    СОХРАНИТЬ ПОРЯДОК
+                </button>
+                <button class="btn btn--block" id="btn-reset-pages">
+                    СБРОСИТЬ К ПО УМОЛЧАНИЮ
+                </button>
+            </div>
+        </section>
+
+        <!-- ПРАВАЯ КОЛОНКА — Условные страницы -->
+        <section class="panel">
+            <h2 class="panel__title">Условные страницы</h2>
+
+            <div class="text-dim mb-16" style="font-size:12px;">
+                Некоторые страницы появляются в ротации только при определённых условиях.
+            </div>
+
+            <!-- Утечка -->
+            <div class="form-row" style="flex-direction:column; align-items:stretch;">
+                <label style="margin-bottom:6px;">Утечка (LEAK)</label>
+                <select id="cond-leak">
+                    <option value="auto">Авто — показывать при утечке &gt;100MB</option>
+                    <option value="always">Всегда показывать</option>
+                    <option value="never">Никогда не показывать</option>
+                </select>
+                <div class="text-dim mt-8" style="font-size:12px;">
+                    Авто: страница появляется, если есть процесс с приростом
+                    памяти более 100MB за сессию.
+                </div>
+            </div>
+
+            <!-- Диски -->
+            <div class="form-row" style="flex-direction:column; align-items:stretch; margin-top:16px;">
+                <label style="margin-bottom:6px;">Диски (DISK)</label>
+                <select id="cond-disks">
+                    <option value="auto">Авто — по одному на каждый диск</option>
+                    <option value="one">Только первый (C:)</option>
+                    <option value="never">Никогда не показывать</option>
+                </select>
+                <div class="text-dim mt-8" style="font-size:12px;">
+                    Авто: если дисков несколько, каждый получает свою страницу.
+                </div>
+            </div>
+
+            <!-- FPS -->
+            <div class="form-row" style="flex-direction:column; align-items:stretch; margin-top:16px;">
+                <label style="margin-bottom:6px;">FPS</label>
+                <select id="cond-fps">
+                    <option value="auto">Авто — оверлей при запущенной игре</option>
+                    <option value="page">Как отдельная страница</option>
+                    <option value="never">Никогда не показывать</option>
+                </select>
+                <div class="text-dim mt-8" style="font-size:12px;">
+                    Авто: FPS рисуется поверх текущей страницы, когда игра запущена.
+                </div>
+            </div>
+
+            <div class="mt-16">
+                <button class="btn btn--block btn--green" id="btn-save-conditions">
+                    СОХРАНИТЬ УСЛОВИЯ
+                </button>
+            </div>
+        </section>
+
+        <!-- ПРЕДПРОСМОТР -->
+        <section class="panel panel--wide">
+            <h2 class="panel__title">Предпросмотр ротации</h2>
+
+            <div class="text-dim mb-16" style="font-size:12px;">
+                Сейчас с учётом условий: <span id="pages-count">0</span> страниц.
+            </div>
+
+            <div id="preview-list" style="display:flex; flex-wrap:wrap; gap:8px;">
+                <!-- Заполнится JS -->
+            </div>
+        </section>
+
+    </div>
+
+</main>
+
+<footer class="footer">
+    <span class="footer__heart">♥</span> by KTH-Studio
+</footer>
+
+<script src="script.js"></script>
+<script>
+'use strict';
+
+//  Справочники 
+const PAGE_NAMES = {
+    0: 'GPU',
+    1: 'CPU',
+    2: 'ОЗУ',
+    3: 'Диски',
+    4: 'Сеть',
+    5: 'Пинг',
+    6: 'Утечка',
+    7: 'Климат'
+};
+
+const DEFAULT_ORDER = [0, 1, 2, 3, 4, 5, 6, 7];
+
+//  Состояние 
+let currentOrder = [...DEFAULT_ORDER];
+let conditions = {
+    leak: 'auto',
+    disks: 'auto',
+    fps: 'auto',
+};
+
+//  Загрузка
+async function loadPages() {
+    const r = await PCM.apiGet('/api/pages');
+    if (!r.ok) return;
+
+    const d = r.data;
+    if (d.order && Array.isArray(d.order)) {
+        currentOrder = d.order;
+    }
+
+    // Условия — из настроек
+    const sr = await PCM.apiGet('/api/settings');
+    if (sr.ok && sr.data.conditions) {
+        conditions.leak  = sr.data.conditions.leak  || 'auto';
+        conditions.disks = sr.data.conditions.disks || 'auto';
+        conditions.fps   = sr.data.conditions.fps   || 'auto';
+    }
+
+    // Применить к селектам
+    document.getElementById('cond-leak').value  = conditions.leak;
+    document.getElementById('cond-disks').value = conditions.disks;
+    document.getElementById('cond-fps').value   = conditions.fps;
+
+    renderList();
+    renderPreview();
+}
+
+//  Рендер списка (с drag-and-drop)
+function renderList() {
+    const el = document.getElementById('pages-list');
+    let html = '';
+
+    currentOrder.forEach((pageId, i) => {
+        const name = PAGE_NAMES[pageId] || `#${pageId}`;
+        html += `
+            <li class="dnd-item" data-id="${pageId}">
+                <span class="dnd-item__handle">☰</span>
+                <span class="dnd-item__num">${i + 1}.</span>
+                <span class="dnd-item__name">${PCM.esc(name)}</span>
+            </li>
+        `;
+    });
+
+    el.innerHTML = html;
+
+    // Навесить drag-and-drop
+    PCM.initDragDrop(el, (newOrder) => {
+        currentOrder = newOrder;
+        renderPreview();
+    });
+}
+
+//  Предпросмотр
+function renderPreview() {
+    // Фильтруем по условиям
+    let preview = [];
+
+    for (const pageId of currentOrder) {
+        // Условная фильтрация
+        if (pageId === 6 && conditions.leak === 'never') continue;
+        if (pageId === 3) {
+            if (conditions.disks === 'never') continue;
+        }
+        // FPS не страница — не участвует
+
+        preview.push(pageId);
+    }
+
+    PCM.setText('pages-count', preview.length);
+
+    const el = document.getElementById('preview-list');
+    let html = '';
+
+    preview.forEach((pageId, i) => {
+        const name = PAGE_NAMES[pageId] || `#${pageId}`;
+        html += `
+            <div style="
+                border:1px solid var(--fg-dim);
+                padding:6px 12px;
+                background:#000;
+                font-size:13px;
+            ">
+                <span class="text-dim">${i + 1}.</span>
+                <span class="text-green">${PCM.esc(name)}</span>
+            </div>
+        `;
+    });
+
+    if (preview.length === 0) {
+        html = '<div class="text-red">Нет активных страниц!</div>';
+    }
+
+    el.innerHTML = html;
+}
+
+//  Сохранение порядка
+async function savePages() {
+    const r = await PCM.apiPost('/api/pages', {
+        order: currentOrder,
+        count: currentOrder.length,
+    });
+
+    if (r.ok) {
+        PCM.showToast('✓ Порядок сохранён');
+    } else {
+        PCM.showToast('✗ Ошибка сохранения');
+    }
+}
+
+//  Сброс порядка
+function resetPages() {
+    PCM.showConfirm(
+        'СБРОС ПОРЯДКА',
+        'Порядок страниц будет сброшен по умолчанию. Продолжить?',
+        () => {
+            currentOrder = [...DEFAULT_ORDER];
+            renderList();
+            renderPreview();
+            PCM.showToast('Порядок сброшен (не забудь сохранить)');
+        }
+    );
+}
+
+//  Сохранение условий
+async function saveConditions() {
+    conditions.leak  = document.getElementById('cond-leak').value;
+    conditions.disks = document.getElementById('cond-disks').value;
+    conditions.fps   = document.getElementById('cond-fps').value;
+
+    const r = await PCM.apiPost('/api/settings', {
+        conditions: {
+            leak:  conditions.leak,
+            disks: conditions.disks,
+            fps:   conditions.fps,
+        }
+    });
+
+    if (r.ok) {
+        PCM.showToast('✓ Условия сохранены');
+        renderPreview();
+    } else {
+        PCM.showToast('✗ Ошибка сохранения');
+    }
+}
+
+//  Инициализация
+document.addEventListener('DOMContentLoaded', () => {
+    loadPages();
+
+    document.getElementById('btn-save-pages').onclick = savePages;
+    document.getElementById('btn-reset-pages').onclick = resetPages;
+    document.getElementById('btn-save-conditions').onclick = saveConditions;
+
+    // Селекты условий — живой предпросмотр
+    ['cond-leak', 'cond-disks', 'cond-fps'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('change', () => {
+            conditions.leak  = document.getElementById('cond-leak').value;
+            conditions.disks = document.getElementById('cond-disks').value;
+            conditions.fps   = document.getElementById('cond-fps').value;
+            renderPreview();
+        });
+    });
+});
+</script>
+
+</body>
+</html>

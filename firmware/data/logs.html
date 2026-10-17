@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PC Monitor — Logs</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- НАВИГАЦИЯ -->
+<nav class="nav">
+    <div class="nav__brand">
+        <span class="nav__heart">♥</span>
+        <span>PC Monitor v.5.0</span>
+        <span id="conn-status" style="margin-left:8px;">○</span>
+    </div>
+    <button class="nav__hamburger" id="nav-hamburger">☰</button>
+    <div class="nav__links" id="nav-links">
+        <a href="index.html">Dashboard</a>
+        <a href="settings.html">Settings</a>
+        <a href="control.html">Control</a>
+        <a href="pages.html">Pages</a>
+        <a href="buttons.html">Buttons</a>
+        <a href="ota.html">OTA</a>
+        <a href="logs.html">Logs</a>
+    </div>
+</nav>
+
+<main class="container">
+
+    <!-- ПАНЕЛЬ УПРАВЛЕНИЯ ЛОГАМИ -->
+    <section class="panel panel--wide mb-16">
+        <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;">
+
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn btn--small btn--green" id="btn-autoscroll">
+                    ⬇ Автоскролл: ВКЛ
+                </button>
+                <button class="btn btn--small" id="btn-clear">
+                    ОЧИСТИТЬ
+                </button>
+                <button class="btn btn--small" id="btn-download">
+                    СКАЧАТЬ .TXT
+                </button>
+            </div>
+
+            <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                <label style="color:var(--fg-dim); font-size:13px;">
+                    Фильтр:
+                </label>
+                <input type="text" id="filter-text"
+                       placeholder="поиск..."
+                       style="background:#000; color:var(--fg); border:1px solid var(--fg-dim);
+                              padding:5px 8px; font-family:inherit; font-size:13px;
+                              max-width:200px;">
+
+                <select id="filter-level"
+                        style="background:#000; color:var(--fg); border:1px solid var(--fg-dim);
+                               padding:5px 8px; font-family:inherit; font-size:13px;">
+                    <option value="all">Все</option>
+                    <option value="info">Info</option>
+                    <option value="warn">Warn</option>
+                    <option value="error">Error</option>
+                </select>
+            </div>
+
+            <div class="text-dim" style="font-size:12px;">
+                Строк: <span id="log-count">0</span> / <span id="log-max">500</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ТАБЫ -->
+    <div class="tabs">
+        <button class="tab active" data-source="esp">ESP32</button>
+        <button class="tab" data-source="pc">ПК (данные)</button>
+        <button class="tab" data-source="events">События</button>
+        <button class="tab" data-source="ws">WebSocket</button>
+    </div>
+
+    <!-- ОБЛАСТЬ ЛОГОВ -->
+    <section class="panel panel--wide">
+        <div class="logs" id="logs"></div>
+    </section>
+
+</main>
+
+<footer class="footer">
+    <span class="footer__heart">♥</span> by KTH-Studio
+</footer>
+
+<script src="script.js"></script>
+<script>
+'use strict';
+
+//  Состояние
+const MAX_LINES = 500;
+
+let logs = {
+    esp:    [],   // логи с ESP32 (из /api/logs)
+    pc:     [],   // пакеты данных с ПК
+    events: [],   // события (подключения, ошибки, утечки)
+    ws:     [],   // сообщения WebSocket
+};
+
+let currentSource = 'esp';
+let autoScroll = true;
+let filterText = '';
+let filterLevel = 'all';
+
+// Отслеживание последнего загруженного индекса из /api/logs
+let lastEspLogCount = 0;
+
+// Поллинг статуса
+let lastLinkState = null;
+let lastPageState = null;
+
+//  Добавление строк 
+function addLine(source, text, level = 'info') {
+    if (!logs[source]) logs[source] = [];
+
+    logs[source].push({
+        t: Date.now(),
+        text,
+        level,
+    });
+
+    if (logs[source].length > MAX_LINES) {
+        logs[source].shift();
+    }
+
+    if (source === currentSource) {
+        renderLogs();
+    }
+}
+
+//  Рендер
+function renderLogs() {
+    const el = document.getElementById('logs');
+    const arr = logs[currentSource] || [];
+
+    // Фильтрация
+    const filtered = arr.filter(l => {
+        if (filterLevel !== 'all' && l.level !== filterLevel) return false;
+        if (filterText && !l.text.toLowerCase().includes(filterText.toLowerCase())) return false;
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        el.innerHTML = '<div class="logs__line logs__line--dim">— пусто —</div>';
+    } else {
+        const html = filtered.map(l => {
+            const time = new Date(l.t).toLocaleTimeString('ru-RU', {
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+            const cls = l.level === 'error' ? ' logs__line--error' :
+                       l.level === 'warn'  ? ' logs__line--warn' :
+                       l.level === 'dim'   ? ' logs__line--dim' : '';
+            return `<div class="logs__line${cls}">[${time}] ${PCM.esc(l.text)}</div>`;
+        }).join('');
+        el.innerHTML = html;
+    }
+
+    // Счётчики
+    PCM.setText('log-count', arr.length);
+    PCM.setText('log-max', MAX_LINES);
+
+    // Автоскролл
+    if (autoScroll) {
+        el.scrollTop = el.scrollHeight;
+    }
+}
+
+//  Определение уровня строки
+function detectLevel(text) {
+    const l = text.toLowerCase();
+    if (l.includes('[error]') || l.includes('error:') || l.includes('fail')) return 'error';
+    if (l.includes('[warn]') || l.includes('warning')) return 'warn';
+    if (l.includes('[debug]') || l.includes('debug')) return 'dim';
+    return 'info';
+}
+
+//  Поллинг логов с ESP
+async function pollEspLogs() {
+    const r = await PCM.apiGet('/api/logs');
+    if (!r.ok) return;
+
+    const arr = r.data;
+    if (!Array.isArray(arr)) return;
+
+    // Новые строки (индекс >= lastEspLogCount)
+    if (arr.length > lastEspLogCount) {
+        const newLines = arr.slice(lastEspLogCount);
+        for (const line of newLines) {
+            const level = detectLevel(line);
+            addLine('esp', line, level);
+        }
+        lastEspLogCount = arr.length;
+    } else if (arr.length < lastEspLogCount) {
+        // Лог перезапустился (ESP перезагрузился)
+        lastEspLogCount = 0;
+    }
+}
+
+//  Поллинг данных с ПК
+async function pollPcData() {
+    const r = await PCM.apiGet('/api/data');
+    if (!r.ok) {
+        return;
+    }
+    const d = r.data;
+
+    // Краткая сводка
+    const parts = [];
+    if (d.gpu?.present)  parts.push(`GPU ${d.gpu.load}% ${d.gpu.temp}C`);
+    if (d.cpu?.present)  parts.push(`CPU ${d.cpu.load}% ${d.cpu.temp}C`);
+    if (d.ram?.present)  parts.push(`RAM ${d.ram.load}%`);
+    if (d.net?.present)  parts.push(`NET ↓${d.net.down_mbit?.toFixed(1)}`);
+    if (d.ping?.present) parts.push(`PING ${d.ping.avg}ms`);
+
+    const text = parts.join(' | ');
+    if (text) {
+        addLine('pc', text, 'info');
+    }
+
+    // События
+
+    // Связь
+    if (d.link !== lastLinkState) {
+        if (d.link) {
+            addLine('events', '✓ Связь с ПК установлена', 'info');
+        } else {
+            addLine('events', '✗ Связь с ПК потеряна', 'error');
+        }
+        lastLinkState = d.link;
+    }
+
+    // Смена страницы
+    if (d.page !== lastPageState) {
+        const pageNames = ['GPU', 'CPU', 'ОЗУ', 'Диски', 'Сеть', 'Пинг', 'Утечка', 'Климат'];
+        addLine('events', `→ Страница ${d.page + 1}: ${pageNames[d.page] || '?'}`, 'info');
+        lastPageState = d.page;
+    }
+
+    // Утечка
+    if (d.leak?.present) {
+        // Добавляем не каждый раз, а только если изменился max
+        if (!pollPcData._lastLeakMax || d.leak.max_delta_mb > pollPcData._lastLeakMax + 50) {
+            addLine('events',
+                `⚠ Утечка: ${d.leak.items?.[0]?.name || '?'} +${d.leak.max_delta_mb}MB`,
+                'warn');
+            pollPcData._lastLeakMax = d.leak.max_delta_mb;
+        }
+    } else {
+        pollPcData._lastLeakMax = 0;
+    }
+
+    // FPS
+    if (d.fps?.present) {
+        if (pollPcData._lastGame !== d.fps.game) {
+            addLine('events', `▶ Игра запущена: ${d.fps.game}`, 'info');
+            pollPcData._lastGame = d.fps.game;
+        }
+    } else if (pollPcData._lastGame) {
+        addLine('events', `⏹ Игра закрыта: ${pollPcData._lastGame}`, 'info');
+        pollPcData._lastGame = null;
+    }
+
+    // Медиа
+    if (d.media?.present && d.media.updated) {
+        addLine('events',
+            `♪ ${d.media.app}: ${d.media.artist} — ${d.media.track}`,
+            'info');
+    }
+}
+
+//  WebSocket лог
+function wsLog(text, level = 'dim') {
+    addLine('ws', text, level);
+}
+
+//  Очистка
+function clearLogs() {
+    logs[currentSource] = [];
+    if (currentSource === 'esp') {
+        lastEspLogCount = 0;
+    }
+    renderLogs();
+    PCM.showToast(`Очищен лог: ${currentSource}`);
+}
+
+//  Скачивание
+function downloadLogs() {
+    const arr = logs[currentSource] || [];
+    if (arr.length === 0) {
+        PCM.showToast('Лог пуст');
+        return;
+    }
+
+    let content = `# PC Monitor — Logs (${currentSource})\n`;
+    content += `# Date: ${new Date().toISOString()}\n`;
+    content += `# Lines: ${arr.length}\n\n`;
+
+    for (const l of arr) {
+        const time = new Date(l.t).toISOString();
+        content += `[${time}] [${l.level.toUpperCase()}] ${l.text}\n`;
+    }
+
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `pcmonitor_${currentSource}_${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    PCM.showToast('Скачано');
+}
+
+//  Инициализация
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Табы
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentSource = tab.dataset.source;
+            renderLogs();
+        });
+    });
+
+    // Автоскролл
+    const btnAutoscroll = document.getElementById('btn-autoscroll');
+    btnAutoscroll.onclick = () => {
+        autoScroll = !autoScroll;
+        btnAutoscroll.textContent = autoScroll ? '⬇ Автоскролл: ВКЛ' : '⬇ Автоскролл: ВЫКЛ';
+        btnAutoscroll.classList.toggle('btn--green', autoScroll);
+        if (autoScroll) {
+            const el = document.getElementById('logs');
+            el.scrollTop = el.scrollHeight;
+        }
+    };
+
+    // Очистка и скачивание
+    document.getElementById('btn-clear').onclick = clearLogs;
+    document.getElementById('btn-download').onclick = downloadLogs;
+
+    // Фильтры
+    document.getElementById('filter-text').addEventListener('input', (e) => {
+        filterText = e.target.value;
+        renderLogs();
+    });
+    document.getElementById('filter-level').addEventListener('change', (e) => {
+        filterLevel = e.target.value;
+        renderLogs();
+    });
+
+    // Начальный лог
+    wsLog('Logs page initialized', 'dim');
+    wsLog(`Connected: ${State.connected}`, 'dim');
+
+    // Поллинг
+    pollEspLogs();
+    pollPcData();
+    setInterval(pollEspLogs, 2000);
+    setInterval(pollPcData, 3000);
+
+    // WebSocket
+    PCM.onData((msg) => {
+        if (msg.type === 'state') {
+            // Не логируем каждое обновление state (слишком часто)
+        } else if (msg.type === 'log') {
+            // Логи от ESP по WS
+            addLine('esp', msg.line, detectLevel(msg.line));
+        } else if (msg.type === 'notify') {
+            wsLog(`Notification: ${msg.text || '?'}`, 'info');
+        }
+    });
+
+    // Отслеживание статуса WS
+    let wasConnected = false;
+    setInterval(() => {
+        if (State.connected !== wasConnected) {
+            wasConnected = State.connected;
+            wsLog(State.connected ? '✓ WebSocket подключён' : '✗ WebSocket отключён',
+                  State.connected ? 'info' : 'error');
+        }
+    }, 1000);
+});
+</script>
+
+</body>
+</html>

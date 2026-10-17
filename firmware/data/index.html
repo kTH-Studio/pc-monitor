@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PC Monitor — Dashboard</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- НАВИГАЦИЯ-->
+<nav class="nav">
+    <div class="nav__brand">
+        <span class="nav__heart">♥</span>
+        <span>PC Monitor v.5.0</span>
+        <span id="conn-status" style="margin-left:8px;">○</span>
+    </div>
+
+    <button class="nav__hamburger" id="nav-hamburger">☰</button>
+
+    <div class="nav__links" id="nav-links">
+        <a href="index.html">Dashboard</a>
+        <a href="settings.html">Settings</a>
+        <a href="control.html">Control</a>
+        <a href="pages.html">Pages</a>
+        <a href="buttons.html">Buttons</a>
+        <a href="ota.html">OTA</a>
+        <a href="logs.html">Logs</a>
+    </div>
+</nav>
+
+<!-- КОНТЕНТ -->
+<main class="container">
+
+    <!-- СТАТУС ESP32 (сверху) -->
+    <section class="panel panel--wide mb-16">
+        <h2 class="panel__title">ESP32 · System</h2>
+        <div class="grid" id="esp-status">
+            <div class="panel__row">
+                <span class="key">Версия</span>
+                <span class="val" id="esp-fw">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Uptime</span>
+                <span class="val" id="esp-uptime">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">IP</span>
+                <span class="val" id="esp-ip">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">SSID</span>
+                <span class="val" id="esp-ssid">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">RSSI</span>
+                <span class="val" id="esp-rssi">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Heap</span>
+                <span class="val" id="esp-heap">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Связь с ПК</span>
+                <span class="val" id="esp-link">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Канал</span>
+                <span class="val" id="esp-channel">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Страница</span>
+                <span class="val" id="esp-page">--</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- СЕТКА ДАТЧИКОВ -->
+    <div class="grid">
+
+        <!-- GPU -->
+        <section class="panel" id="panel-gpu">
+            <h2 class="panel__title">GPU</h2>
+            <div class="panel__row">
+                <span class="key">Модель</span>
+                <span class="val" id="gpu-name">--</span>
+            </div>
+            <div class="panel__row big">
+                <span class="key">Загрузка</span>
+                <span class="val" id="gpu-load">--</span>
+            </div>
+            <div class="bar"><div class="bar__fill" id="gpu-bar" style="width:0%"></div></div>
+            <div class="panel__row big mt-8">
+                <span class="key">Температура</span>
+                <span class="val" id="gpu-temp">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">VRAM</span>
+                <span class="val" id="gpu-vram">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Питание</span>
+                <span class="val" id="gpu-power">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Кулер</span>
+                <span class="val" id="gpu-fan">--</span>
+            </div>
+            <div class="panel__row dim">
+                <span class="key">Драйвер</span>
+                <span class="val" id="gpu-driver">--</span>
+            </div>
+        </section>
+
+        <!-- CPU -->
+        <section class="panel" id="panel-cpu">
+            <h2 class="panel__title">CPU</h2>
+            <div class="panel__row">
+                <span class="key">Модель</span>
+                <span class="val" id="cpu-name">--</span>
+            </div>
+            <div class="panel__row big">
+                <span class="key">Загрузка</span>
+                <span class="val" id="cpu-load">--</span>
+            </div>
+            <div class="bar"><div class="bar__fill" id="cpu-bar" style="width:0%"></div></div>
+            <div class="panel__row big mt-8">
+                <span class="key">Температура</span>
+                <span class="val" id="cpu-temp">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Частота</span>
+                <span class="val" id="cpu-freq">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Питание</span>
+                <span class="val" id="cpu-power">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Core max</span>
+                <span class="val" id="cpu-coremax">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Кулер</span>
+                <span class="val" id="cpu-fan">--</span>
+            </div>
+            <div class="panel__row dim">
+                <span class="key">Vcore</span>
+                <span class="val" id="cpu-vcore">--</span>
+            </div>
+        </section>
+
+        <!-- RAM -->
+        <section class="panel" id="panel-ram">
+            <h2 class="panel__title">RAM</h2>
+            <div class="panel__row">
+                <span class="key">Модуль</span>
+                <span class="val" id="ram-name">--</span>
+            </div>
+            <div class="panel__row big">
+                <span class="key">Загрузка</span>
+                <span class="val" id="ram-load">--</span>
+            </div>
+            <div class="bar"><div class="bar__fill" id="ram-bar" style="width:0%"></div></div>
+            <div class="panel__row mt-8">
+                <span class="key">Использовано</span>
+                <span class="val" id="ram-used">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Частота</span>
+                <span class="val" id="ram-freq">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Тип</span>
+                <span class="val" id="ram-type">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Температура</span>
+                <span class="val" id="ram-temp">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Напряжение</span>
+                <span class="val" id="ram-voltage">--</span>
+            </div>
+            <div class="panel__row dim">
+                <span class="key">Каналы</span>
+                <span class="val" id="ram-channels">--</span>
+            </div>
+        </section>
+
+        <!-- DISKS -->
+        <section class="panel" id="panel-disks">
+            <h2 class="panel__title">Диски</h2>
+            <div id="disks-list">
+                <div class="text-dim">нет данных</div>
+            </div>
+        </section>
+
+        <!-- NET -->
+        <section class="panel" id="panel-net">
+            <h2 class="panel__title">Сеть</h2>
+            <div class="panel__row">
+                <span class="key">Адаптер</span>
+                <span class="val" id="net-adapter">--</span>
+            </div>
+            <div class="panel__row big">
+                <span class="key">↓ Скач</span>
+                <span class="val" id="net-down">--</span>
+            </div>
+            <div class="panel__row big">
+                <span class="key">↑ Отдача</span>
+                <span class="val" id="net-up">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Линк</span>
+                <span class="val" id="net-link">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Загрузка канала</span>
+                <span class="val" id="net-load">--</span>
+            </div>
+            <div class="bar"><div class="bar__fill" id="net-bar" style="width:0%"></div></div>
+            <div class="panel__row mt-8">
+                <span class="key">Скачано / отдано</span>
+                <span class="val" id="net-total">--</span>
+            </div>
+            <div class="panel__row dim">
+                <span class="key">IP</span>
+                <span class="val" id="net-ip">--</span>
+            </div>
+        </section>
+
+        <!-- PING -->
+        <section class="panel" id="panel-ping">
+            <h2 class="panel__title">Ping</h2>
+            <div class="panel__row big">
+                <span class="key">Средний</span>
+                <span class="val" id="ping-avg">--</span>
+            </div>
+            <div id="ping-list" class="mt-8">
+                <div class="text-dim">нет данных</div>
+            </div>
+        </section>
+
+        <!-- LEAK -->
+        <section class="panel" id="panel-leak">
+            <h2 class="panel__title">Утечка памяти</h2>
+            <div class="panel__row big">
+                <span class="key">Макс. прирост</span>
+                <span class="val" id="leak-max">--</span>
+            </div>
+            <div id="leak-list" class="mt-8">
+                <div class="text-dim">утечек нет</div>
+            </div>
+        </section>
+
+        <!-- CLIMATE -->
+        <section class="panel" id="panel-climate">
+            <h2 class="panel__title">Климат (BME280 + LDR)</h2>
+            <div class="panel__row big">
+                <span class="key">Температура</span>
+                <span class="val" id="climate-temp">--</span>
+            </div>
+            <div class="panel__row big">
+                <span class="key">Влажность</span>
+                <span class="val" id="climate-hum">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Давление</span>
+                <span class="val" id="climate-press">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Освещённость</span>
+                <span class="val" id="climate-light">--</span>
+            </div>
+            <div class="bar"><div class="bar__fill" id="climate-bar" style="width:0%"></div></div>
+        </section>
+
+        <!-- FPS -->
+        <section class="panel" id="panel-fps">
+            <h2 class="panel__title">FPS</h2>
+            <div class="panel__row">
+                <span class="key">Игра</span>
+                <span class="val" id="fps-game">--</span>
+            </div>
+            <div class="panel__row big">
+                <span class="key">Текущий</span>
+                <span class="val" id="fps-current">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">min / max</span>
+                <span class="val" id="fps-minmax">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Просадка</span>
+                <span class="val" id="fps-drop">--</span>
+            </div>
+            <div class="panel__row dim">
+                <span class="key">GPU / CPU</span>
+                <span class="val" id="fps-loads">--</span>
+            </div>
+        </section>
+
+        <!-- MEDIA -->
+        <section class="panel" id="panel-media">
+            <h2 class="panel__title">Медиа</h2>
+            <div class="panel__row">
+                <span class="key">Плеер</span>
+                <span class="val" id="media-app">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Статус</span>
+                <span class="val" id="media-status">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Исполнитель</span>
+                <span class="val" id="media-artist">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Трек</span>
+                <span class="val" id="media-track">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Альбом</span>
+                <span class="val" id="media-album">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Позиция</span>
+                <span class="val" id="media-pos">--</span>
+            </div>
+            <div class="bar"><div class="bar__fill" id="media-bar" style="width:0%"></div></div>
+        </section>
+
+    </div>
+</main>
+
+<!-- ФУТЕР -->
+<footer class="footer">
+    <span class="footer__heart">♥</span> by KTH-Studio
+</footer>
+
+<script src="script.js"></script>
+<script>
+'use strict';
+
+//  Загрузка данных
+async function loadStatus() {
+    const r = await PCM.apiGet('/api/status');
+    if (!r.ok) return;
+    const d = r.data;
+
+    PCM.setText('esp-fw', d.fw || '--');
+    PCM.setText('esp-uptime', PCM.fmtUptime(d.uptime));
+    PCM.setText('esp-ip', d.ip || '--');
+    PCM.setText('esp-ssid', d.ssid || '--');
+    PCM.setText('esp-rssi', d.rssi ? d.rssi + ' dBm' : '--');
+    PCM.setText('esp-heap', d.heap ? Math.round(d.heap / 1024) + ' KB' : '--');
+
+    // Связь с ПК
+    const linkEl = document.getElementById('esp-link');
+    linkEl.textContent = d.linked ? 'OK' : 'нет';
+    linkEl.className = 'val ' + (d.linked ? 'text-green' : 'text-red');
+
+    // Канал
+    const channels = ['—', 'Serial', 'TCP', 'HTTP'];
+    PCM.setText('esp-channel', channels[d.channel] || 
+
+    // Страница
+    PCM.setText('esp-page', `${(d.page ?? 0) + 1} / ${d.pages ?? 0}`);
+}
+
+async function loadData() {
+    const r = await PCM.apiGet('/api/data');
+    if (!r.ok) return;
+    const d = r.da
+    updateAll(d);
+
+//  Обновление всех панелей
+function updateAll(d) {
+
+    // GPU
+    if (d.gpu && d.gpu.present) {
+        PCM.setText('gpu-name', d.gpu.name || '--');
+        PCM.setText('gpu-load', d.gpu.load + '%');
+        PCM.setText('gpu-temp', d.gpu.temp + '°C');
+        PCM.setText('gpu-vram', (d.gpu.vram_used || 0) + '/' + (d.gpu.vram_total || 0) + 'GB');
+        PCM.setText('gpu-power', d.gpu.power + 'W');
+        PCM.setText('gpu-fan', d.gpu.fan + 'RPM');
+        PCM.setText('gpu-driver', 'drv ' + (d.gpu.driver || '--'));
+        setBar('gpu-bar', d.gpu.load);
+    } else {
+        PCM.setText('gpu-name', 'не найдено');
+    }
+
+    // CPU
+    if (d.cpu && d.cpu.present) {
+        PCM.setText('cpu-name', d.cpu.name || '--');
+        PCM.setText('cpu-load', d.cpu.load + '%');
+        PCM.setText('cpu-temp', d.cpu.temp + '°C');
+        PCM.setText('cpu-freq', ((d.cpu.freq || 0) / 1000).toFixed(2) + 'GHz');
+        PCM.setText('cpu-power', d.cpu.power +;
+     M.setText('cpu-coremax', d.cpu.core_max + '°C');
+        PCM.setText('cpu-fan', d.cpu.fan + 'RPM');
+        PCM.setText('cpu-vcore', ((d.cpu.vcore || 0) / 1000).toFixed(2) + 'V');
+        setBar('cpu-bar', d.cpu.load);
+    } else {
+        PCM.setText('cpu-name', 'не найдено');
+    }
+
+    // RAM
+    if (d.ram && d.ram.present) {
+      M.setText('ram-name', d.ram.name || '--');
+        PCM.setText('ram-load', d.ram.load + '%');
+        PCM.setText('ram-used', (d.ram.used || 0) + ' / ' + (d.ram.total || 0) + 'GB');
+        PCM.setText('ram-freq', d.ram.freq + 'MHz');
+        PCM.setText('ram-type', d.ram.type || '--');
+        PCM.setText('ram-temp', d.ram.temp ? d.ram.temp + '°C' : '--');
+        PCM.setText('ram-voltage', d.ram.voltage ? (d.ram.voltage / 1000).toFixed(2) + 'V' : '--');
+        PCM.setText('ram-channels', d.ram.dual ? 'Dual' : 'Single');
+        setBar('ram-bar', d.ram.load);
+    }
+
+    // DISKS
+    if (d.disks && d.disks.length) {
+        let html = '';
+        for (const dk of d.disks) {
+            const loadCls = PCM.pctClass(dk.load, 70, 90);
+            const lifeCls = dk.life_left < 20 ? 'text-red' : (dk.life_left < 50 ? 'text-orange' : 'text-green');
+            html += `
+                <div style="padding:6px 0; border-bottom:1px dashed rgba(0,255,0,0.15);">
+                    <div class="panel__row">
+                        <span class="key">${PCM.esc(dk.letter)}: ${PCM.esc(dk.name)}</span>
+                        <span class="val ${loadCls}">${dk.load}%</span>
+                    </div>
+                    <div class="bar"><div class="bar__fill" style="width:${dk.load}%"></div></div>
+                    <div class="panel__row dim" style="font-size:12px;">
+                        <span>${dk.used}/${dk.total}GB · ${dk.temp ? dk.temp + '°C' : '--'} · ${PCM.esc(dk.type)}</span>
+                        <span class="${lifeCls}">жизнь ${dk.life_left}%</span>
+                    </               <div class="panel__row dim" style="font-size:12px;">
+                        <span>R: ${dk.read_rate}MB/s · W: ${dk.write_rate}MB/s</span>
+                        <span>акт. ${dk.activity}%</span>
+                    </div>
+                </div>
+            `;
+        }
+        document.getElementById('disks-list').innerHTML l;
+    e {
+        document.geementById('disks-list').innerHTML = '<div class="text-dim">нет данных</div>';
+    }  
+
+    // NET
+    if (d.net && d.net.present) {
+        PCM.setText('net-adapter', d.net.adapter || '--');
+        PCM.setText('net-down', (d.net.down_mbit || 0).toFixed(1) + ' Mbit/s');
+        PCM.setText('net-up',   (d.net.up_mbit   || 0).toFixed(1) + ' Mbit/s');
+        PCM.setText('net-link', (d.net.link_speed || 0) + ' Mbit/s');
+        PCM.setText('net-load', d.net.channel_load + '%');
+        PCM.setText('net-total', (d.net.total_down_gb || 0) + 'GB / ' + (d.net.total_up_gb || 0) + 'GB');
+        PCM.setText('net-ip', d.net.ip || '--');
+        setBar('net-bar', d.net.channel_load);
+    }
+
+    // PING
+    if (d.ping && d.ping.present) {
+        const avgCls = d.ping.avg <= 20 ? 'text-green' :
+                       d.ping.avg <= 50 ? 'text-blue' :
+                       d.ping.avg <= 100 ? 'text-green' :
+                       d.ping.avg <= 200 ? 'text-orange' : 'text-red';
+        const avgEl = document.getElementById('ping-avg');
+        avgEl.textContent = d.ping.avg + 'ms';
+        avgEl.className = 'val ' + avgCls;
+
+        let html = '';
+        for (const t of (d.ping.targets || [])) {
+            const ms = t.ms < 0 ? '--' : t.ms + 'ms';
+            const cls = t.ms < 0 ? 'text-red' : (t.ms > 200 ? 'text-orange' : '');
+            html += `
+                <div class="panel__row" style="font-size:13px;">
+                    <span class="key">${PCM.esc(t.name)}</span>
+                    <span class="val ${cls}">${ms}</span>
+                </div>
+            `;
+        }
+        document.getElementById('ping-list').innerHTML = html;
+    }
+
+    // LEAK
+    if (d.leak && d.leak.present) {
+        PCM.setText('leak-max', '+' + d.leak.max_delta_mb + 'MB');
+        let html = '';
+        for (const it of (d.leak.items || [])) {
+            html += `
+                <div class="panel__row" style="font-size:13px;">
+                    <span class="key">${PCM.esc(it.name)}</span>
+                    <span class="val text-orange">+${it.delta_mb}MB</span>
+                </div>
+            `;
+        }
+        document.getElementById('leak-list').innerHTML = html;
+    } else {
+        PCM.setText('leak-max', '—');
+        document.getElementById('leak-list').innerHTML = '<div class="text-dim">утечек нет</div>';
+    }
+
+  // CLIMATE
+    if (d.climate) {
+        PCM.setText('climate-temp', (d.climate.temp || 0).toFixed(1) + '°C');
+        PCM.setText('climate-hum', Math.round(d.climate.hum || 0) + '%');
+        PCM.setText('climate-press', Math.round(d.climate.press_mm || 0) + 'мм');
+        PCM.setText('climate-light', (d.climate.light || 0) + '%');
+        setBar('climate-bar', d.climate.light);
+    }
+
+    // FPS
+    if (d.fps && d.fps.present) {
+        PCM.setText('fps-game', d.fps.game || '--');
+        PCM.setText('fps-current', d.fps.current + ' fps');
+        PCM.setText('fps-minmax', d.fps.min + ' / ' + d.fps.max + ' fps');
+        PCM.setText('fps-drop', d.fps.drop_pct + '%');
+        PCM.setText('fps-loads', d.fps.gpu_load + '% / ' + d.fps.cpu_load + '%');
+    } else {
+        PCM.setText('fps-game', 'игра не запущена');
+        PCM.setText('fps-current', '--');
+        PCM.setText('fps-minmax', '--');
+        PCM.setText('fps-drop', '--');
+        PCM.setText('fps-loads', '--');
+    }
+
+    // MEDIA
+    if (d.media && d.media.present) {
+        PCM.setText('media-app', d.media.app || '--');
+        PCM.setText('media-status', d.media.playing ? '▶ играет' : '⏸ пауза');
+        PCM.setText('media-artist', d.media.artist || '--');
+        PCM.setText('media-track', d.media.track || '--');
+        PCM.setText('media-album', d.media.album || '--');
+        PCM.setText('media-pos',
+            PCM.fmtTime(d.media.pos) + ' / ' + PCM.fmtTime(d.media.dur));
+        const pct = d.media.dur > 0
+            ? Math.round(d.media.pos * 100 / d.media.dur)
+            : 0;
+        setBar('media-bar', pct);
+    } else {
+        PCM.setText('media-app', '--');
+        PCM.setText('media-status', 'нет активного плеера');
+        PCM.setText('media-artist', '--');
+        PCM.setText('media-track', '--');
+        PCM.setText('media-album', '--');
+        PCM.setText('media-pos', '--');
+        setBar('media-bar', 0);
+    }
+}
+
+//  Хелпер: обновить прогресс-бар
+function setBar(id, pct) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    pct = Math.max(0, Math.min(100, pct || 0));
+    el.style.width = pct + '%';
+    el.classList.remove('bar__fill--warn', 'bar__fill--crit');
+    if (pct >= 90) el.classList.add('bar__fill--crit');
+    else if (pct >= 70) el.classList.add('bar__fill--warn');
+}
+
+//  Старт
+document.addEventListener('DOMContentLoaded', () => {
+    loadStatus();
+    loadData();
+
+    // Обновление раз в секунду
+    setInterval(loadStatus, 3000);
+    setInterval(loadData, 1000);
+
+    // Обновление от WebSocket (быстрее)
+    PCM.onData(() => {
+        loadData();
+    });
+});
+</script>
+
+</body>
+</html>

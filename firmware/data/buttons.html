@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PC Monitor — Buttons</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- НАВИГАЦИЯ -->
+<nav class="nav">
+    <div class="nav__brand">
+        <span class="nav__heart">♥</span>
+        <span>PC Monitor v.5.0</span>
+        <span id="conn-status" style="margin-left:8px;">○</span>
+    </div>
+    <button class="nav__hamburger" id="nav-hamburger">☰</button>
+    <div class="nav__links" id="nav-links">
+        <a href="index.html">Dashboard</a>
+        <a href="settings.html">Settings</a>
+        <a href="control.html">Control</a>
+        <a href="pages.html">Pages</a>
+        <a href="buttons.html">Buttons</a>
+        <a href="ota.html">OTA</a>
+        <a href="logs.html">Logs</a>
+    </div>
+</nav>
+
+<main class="container">
+
+    <!-- ПРОФИЛИ -->
+    <section class="panel panel--wide mb-16">
+        <h2 class="panel__title">Профили кнопок</h2>
+
+        <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+            <div class="form-row" style="flex:1; min-width:220px; border:none; padding:0;">
+                <label>Активный профиль</label>
+                <select id="profile-select" style="max-width:240px;">
+                    <option value="default">Обычный</option>
+                    <option value="game">Игровой</option>
+                    <option value="night">Ночной</option>
+                    <option value="media">Медиа</option>
+                </select>
+            </div>
+
+            <button class="btn btn--small btn--green" id="btn-load-profile">
+                ЗАГРУЗИТЬ
+            </button>
+            <button class="btn btn--small" id="btn-save-profile-as">
+                СОХРАНИТЬ КАК...
+            </button>
+            <button class="btn btn--small btn--orange" id="btn-duplicate-profile">
+                ДУБЛИРОВАТЬ
+            </button>
+            <button class="btn btn--small btn--red" id="btn-delete-profile">
+                УДАЛИТЬ
+            </button>
+        </div>
+
+        <div class="text-dim mt-8" style="font-size:12px;">
+            Профиль — это отдельный набор раскладки кнопок. Можно быстро переключаться:
+            например, «Игровой» — где BTN1/2 переключают треки.
+        </div>
+    </section>
+
+    <!-- КНОПКИ -->
+    <div class="grid grid--2">
+
+        <!-- BTN1 -->
+        <section class="panel" data-btn="0">
+            <h2 class="panel__title">BTN1 <span class="text-dim">(GPIO 4)</span></h2>
+
+            <div class="form-row">
+                <label>Короткое</label>
+                <select class="btn-action" data-btn="0" data-type="0"></select>
+            </div>
+
+            <div class="form-row">
+                <label>Долгое</label>
+                <select class="btn-action" data-btn="0" data-type="1"></select>
+            </div>
+
+            <div class="form-row">
+                <label>Двойное</label>
+                <select class="btn-action" data-btn="0" data-type="2"></select>
+            </div>
+        </section>
+
+        <!-- BTN2 -->
+        <section class="panel" data-btn="1">
+            <h2 class="panel__title">BTN2 <span class="text-dim">(GPIO 27)</span></h2>
+
+            <div class="form-row">
+                <label>Короткое</label>
+                <select class="btn-action" data-btn="1" data-type="0"></select>
+            </div>
+
+            <div class="form-row">
+                <label>Долгое</label>
+                <select class="btn-action" data-btn="1" data-type="1"></select>
+            </div>
+
+            <div class="form-row">
+                <label>Двойное</label>
+                <select class="btn-action" data-btn="1" data-type="2"></select>
+            </div>
+        </section>
+
+        <!-- BTN3 -->
+        <section class="panel" data-btn="2">
+            <h2 class="panel__title">BTN3 <span class="text-dim">(GPIO 14)</span></h2>
+
+            <div class="form-row">
+                <label>Короткое</label>
+                <select class="btn-action" data-btn="2" data-type="0"></select>
+            </div>
+
+            <div class="form-row">
+                <label>Долгое</label>
+                <select class="btn-action" data-btn="2" data-type="1"></select>
+            </div>
+
+            <div class="form-row">
+                <label>Двойное</label>
+                <select class="btn-action" data-btn="2" data-type="2"></select>
+            </div>
+        </section>
+
+        <!-- BTN4 -->
+        <section class="panel" data-btn="3">
+            <h2 class="panel__title">BTN4 <span class="text-dim">(GPIO 5)</span></h2>
+
+            <div class="form-row">
+                <label>Короткое</label>
+                <select class="btn-action" data-btn="3" data-type="0"></select>
+            </div>
+
+            <div class="form-row">
+                <label>Долгое</label>
+                <select class="btn-action" data-btn="3" data-type="1"></select>
+            </div>
+
+            <div class="form-row">
+                <label>Двойное</label>
+                <select class="btn-action" data-btn="3" data-type="2"></select>
+            </div>
+        </section>
+
+        <!-- BTN5 -->
+        <section class="panel" data-btn="4">
+            <h2 class="panel__title">BTN5 <span class="text-dim">(GPIO 23)</span></h2>
+
+            <div class="form-row">
+                <label>Короткое</label>
+                <select class="btn-action" data-btn="4" data-type="0"></select>
+            </div>
+
+            <div class="form-row">
+                <label>Долгое</label>
+                <select class="btn-action" data-btn="4" data-type="1"></select>
+            </div>
+
+            <div class="form-row">
+                <label>Двойное</label>
+                <select class="btn-action" data-btn="4" data-type="2"></select>
+            </div>
+        </section>
+
+        <!-- СПРАВКА -->
+        <section class="panel">
+            <h2 class="panel__title">Справка</h2>
+
+            <div class="text-dim" style="font-size:12px; line-height:1.6;">
+                <b>Короткое</b> — быстрое нажатие и отпускание. Сработает через 300мс
+                (ждём, не будет ли второго нажатия).<br><br>
+
+                <b>Долгое</b> — удержание 800мс и более.<br><br>
+
+                <b>Двойное</b> — два коротких нажатия подряд (до 300мс между ними).<br><br>
+
+                <b>Приоритет:</b> если сработало долгое или двойное — короткое
+                не выполнится.<br><br>
+
+                <b>Питание ПК:</b> действия «сон / перезагрузка / выключение ПК»
+                показывают отсчёт 5 сек на малом OLED. Отмена — любой кнопкой,
+                назначенной на «Отмена питания».
+            </div>
+        </section>
+
+    </div>
+
+    <!-- СОХРАНЕНИЕ -->
+    <div class="mt-16" style="position: sticky; bottom: 16px;">
+        <button class="btn btn--green btn--block" id="btn-save">
+            СОХРАНИТЬ РАСКЛАДКУ
+        </button>
+    </div>
+
+</main>
+
+<footer class="footer">
+    <span class="footer__heart">♥</span> by KTH-Studio
+</footer>
+
+<script src="script.js"></script>
+<script>
+'use strict';
+
+//  Список действий (соответствует ButtonAction в settings.h)
+const ACTIONS = [
+    { id: 0,  name: '— Ничего —' },
+    { id: 1,  name: 'Следующая страница' },
+    { id: 2,  name: 'Предыдущая страница' },
+    { id: 3,  name: 'Следующий трек' },
+    { id: 4,  name: 'Предыдущий трек' },
+    { id: 5,  name: 'Пауза / Плей' },
+    { id: 6,  name: 'Ночной режим вкл/выкл' },
+    { id: 7,  name: 'Сменить язык EN/RU' },
+    { id: 8,  name: '🌙 Сон ПК' },
+    { id: 9,  name: '↻ Перезагрузка ПК' },
+    { id: 10, name: '⏻ Выключение ПК' },
+    { id: 11, name: '✗ Отмена питания' },
+    { id: 12, name: 'Перезагрузка ESP32' },
+    { id: 13, name: 'Сброс счётчиков' },
+];
+
+//  Дефолтная раскладка
+const DEFAULT_LAYOUT = [
+    // BTN1: короткое / долгое / двойное
+    [2, 0, 0],  // пред. страница
+    [5, 0, 0],  // пауза/плей
+    [3, 0, 0],  // след. трек
+    [1, 0, 11], // след. страница / отмена питания
+    [6, 7, 0],  // ночной / смена языка
+];
+
+//  Состояние
+let currentLayout = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
+let profiles = {
+    default: JSON.parse(JSON.stringify(DEFAULT_LAYOUT)),
+    game:    null,
+    night:   null,
+    media:   null,
+};
+let currentProfile = 'default';
+
+//  Инициализация селектов
+function initSelects() {
+    document.querySelectorAll('.btn-action').forEach(sel => {
+        let html = '';
+        for (const a of ACTIONS) {
+            html += `<option value="${a.id}">${a.name}</option>`;
+        }
+        sel.innerHTML = html;
+
+        // Обработчик
+        sel.addEventListener('change', () => {
+            const btn = Number(sel.dataset.btn);
+            const type = Number(sel.dataset.type);
+            currentLayout[btn][type] = Number(sel.value);
+        });
+    });
+}
+
+//  Заполнение селектов из раскладки
+function applyLayoutToUI() {
+    document.querySelectorAll('.btn-action').forEach(sel => {
+        const btn = Number(sel.dataset.btn);
+        const type = Number(sel.dataset.type);
+        const action = currentLayout[btn]?.[type] ?? 0;
+        sel.value = String(action);
+    });
+}
+
+//  Загрузка с ESP 
+async function loadButtons() {
+    const r = await PCM.apiGet('/api/buttons');
+    if (!r.ok) return;
+
+    const d = r.data;
+    if (d.buttons && Array.isArray(d.buttons)) {
+        currentLayout = d.buttons.map(b => [
+            b.short  ?? 0,
+            b.long   ?? 0,
+            b.double ?? 0,
+        ]);
+    }
+
+    applyLayoutToUI();
+}
+
+//  Сохранение
+async function saveButtons() {
+    const payload = {
+        buttons: currentLayout.map(arr => ({
+            short:  arr[0],
+            long:   arr[1],
+            double: arr[2],
+        })),
+    };
+
+    const r = await PCM.apiPost('/api/buttons', payload);
+
+    if (r.ok) {
+        PCM.showToast('✓ Раскладка сохранена');
+    } else {
+        PCM.showToast('✗ Ошибка сохранения');
+    }
+}
+
+//  Профили (в localStorage браузера — локальные)
+function loadProfilesFromStorage() {
+    try {
+        const saved = localStorage.getItem('pcmon_profiles');
+        if (saved) {
+            const obj = JSON.parse(saved);
+            Object.assign(profiles, obj);
+        }
+    } catch (e) {
+        console.error('profiles load error:', e);
+    }
+}
+
+function saveProfilesToStorage() {
+    try {
+        localStorage.setItem('pcmon_profiles', JSON.stringify(profiles));
+    } catch (e) {
+        console.error('profiles save error:', e);
+    }
+}
+
+function loadProfile(name) {
+    const p = profiles[name];
+    if (!p) {
+        PCM.showToast(`Профиль «${name}» не настроен`);
+        return;
+    }
+    currentLayout = JSON.parse(JSON.stringify(p));
+    currentProfile = name;
+    applyLayoutToUI();
+    PCM.showToast(`Загружен профиль: ${name}`);
+}
+
+function saveProfileAs(name) {
+    profiles[name] = JSON.parse(JSON.stringify(currentLayout));
+    saveProfilesToStorage();
+    currentProfile = name;
+    PCM.showToast(`Профиль «${name}» сохранён`);
+}
+
+function duplicateProfile() {
+    const name = prompt('Имя нового профиля:', currentProfile + '_copy');
+    if (!name) return;
+    saveProfileAs(name);
+    refreshProfileSelect(name);
+}
+
+function deleteProfile() {
+    if (currentProfile === 'default') {
+        PCM.showToast('Нельзя удалить профиль «default»');
+        return;
+    }
+    PCM.showConfirm(
+        'УДАЛИТЬ ПРОФИЛЬ',
+        `Удалить профиль «${currentProfile}»?`,
+        () => {
+            profiles[currentProfile] = null;
+            saveProfilesToStorage();
+            refreshProfileSelect('default');
+            loadProfile('default');
+        }
+    );
+}
+
+function refreshProfileSelect(selectValue) {
+    const sel = document.getElementById('profile-select');
+    // Оставляем стандартные + добавляем кастомные
+    let html = '';
+    for (const name of Object.keys(profiles)) {
+        const label = name === 'default' ? 'Обычный' :
+                      name === 'game'    ? 'Игровой' :
+                      name === 'night'   ? 'Ночной' :
+                      name === 'media'   ? 'Медиа' : name;
+        html += `<option value="${name}">${label}</option>`;
+    }
+    sel.innerHTML = html;
+    if (selectValue) sel.value = selectValue;
+}
+
+//  Инициализация
+document.addEventListener('DOMContentLoaded', () => {
+    initSelects();
+    loadProfilesFromStorage();
+    refreshProfileSelect('default');
+    loadButtons();
+
+    // Кнопки
+    document.getElementById('btn-save').onclick = saveButtons;
+
+    document.getElementById('btn-load-profile').onclick = () => {
+        const name = document.getElementById('profile-select').value;
+        loadProfile(name);
+    };
+
+    document.getElementById('btn-save-profile-as').onclick = () => {
+        const currentName = document.getElementById('profile-select').value;
+        const name = prompt('Имя профиля для сохранения:', currentName);
+        if (name) saveProfileAs(name);
+        refreshProfileSelect(name);
+    };
+
+    document.getElementById('btn-duplicate-profile').onclick = duplicateProfile;
+    document.getElementById('btn-delete-profile').onclick = deleteProfile;
+
+    // Авто-применение профиля при смене селекта
+    document.getElementById('profile-select').addEventListener('change', (e) => {
+        // Ничего не делаем — только по кнопке «Загрузить»
+        // (чтобы случайная смена не сбила редактируемую раскладку)
+    });
+});
+</script>
+
+</body>
+</html>

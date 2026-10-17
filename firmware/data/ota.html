@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PC Monitor — OTA</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- НАВИГАЦИЯ -->
+<nav class="nav">
+    <div class="nav__brand">
+        <span class="nav__heart">♥</span>
+        <span>PC Monitor v.5.0</span>
+        <span id="conn-status" style="margin-left:8px;">○</span>
+    </div>
+    <button class="nav__hamburger" id="nav-hamburger">☰</button>
+    <div class="nav__links" id="nav-links">
+        <a href="index.html">Dashboard</a>
+        <a href="settings.html">Settings</a>
+        <a href="control.html">Control</a>
+        <a href="pages.html">Pages</a>
+        <a href="buttons.html">Buttons</a>
+        <a href="ota.html">OTA</a>
+        <a href="logs.html">Logs</a>
+    </div>
+</nav>
+
+<main class="container">
+
+    <div class="grid grid--2">
+
+        <!-- ЗАГРУЗКА ПРОШИВКИ -->
+        <section class="panel">
+            <h2 class="panel__title">Обновление прошивки (OTA)</h2>
+
+            <div class="text-dim mb-16" style="font-size:12px; line-height:1.6;">
+                Загрузите <code>.bin</code> файл прошивки, собранный в Arduino IDE
+                или PlatformIO. После успешной загрузки ESP32 автоматически
+                перезагрузится.<br><br>
+                <b class="text-orange">Внимание!</b> Не выключайте ESP во время
+                прошивки — это может привести к «кирпичу».
+            </div>
+
+            <div class="form-row" style="flex-direction:column; align-items:stretch;">
+                <label style="margin-bottom:6px;">Файл прошивки</label>
+                <input type="file" id="ota-file" accept=".bin">
+            </div>
+
+            <div class="ota-progress hidden" id="ota-progress">
+                <div class="text-dim mb-8">Загрузка...</div>
+                <div class="bar">
+                    <div class="bar__fill" id="ota-bar" style="width:0%"></div>
+                </div>
+                <div class="panel__row mt-8">
+                    <span class="key" id="ota-status">ожидание</span>
+                    <span class="val" id="ota-percent">0%</span>
+                </div>
+                <div class="panel__row dim" style="font-size:12px;">
+                    <span id="ota-bytes">0 / 0</span>
+                    <span id="ota-speed">-- KB/s</span>
+                </div>
+            </div>
+
+            <div class="mt-16">
+                <button class="btn btn--block btn--green" id="btn-ota-upload" disabled>
+                    ЗАГРУЗИТЬ ПРОШИВКУ
+                </button>
+                <button class="btn btn--block" id="btn-ota-cancel" disabled>
+                    ОТМЕНИТЬ
+                </button>
+            </div>
+        </section>
+
+        <!-- ИНФОРМАЦИЯ О ТЕКУЩЕЙ ПРОШИВКЕ -->
+        <section class="panel">
+            <h2 class="panel__title">Текущая прошивка</h2>
+
+            <div class="panel__row">
+                <span class="key">Название</span>
+                <span class="val" id="fw-name">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Версия</span>
+                <span class="val" id="fw-version">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Автор</span>
+                <span class="val" id="fw-author">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Uptime</span>
+                <span class="val" id="fw-uptime">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Free Heap</span>
+                <span class="val" id="fw-heap">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">Flash</span>
+                <span class="val" id="fw-flash">--</span>
+            </div>
+            <div class="panel__row">
+                <span class="key">CPU</span>
+                <span class="val" id="fw-cpu">--</span>
+            </div>
+        </section>
+
+        <!-- ИНСТРУКЦИЯ -->
+        <section class="panel panel--wide">
+            <h2 class="panel__title">Как собрать прошивку</h2>
+
+            <div class="text-dim" style="font-size:13px; line-height:1.7;">
+
+                <b class="text-green">Arduino IDE:</b><br>
+                1. Открыть проект <code>PC_Monitor.ino</code>.<br>
+                2. Установить плату: <b>Tools → Board → ESP32 Dev Module</b>.<br>
+                3. <b>Sketch → Export Compiled Binary</b>.<br>
+                4. Файл <code>.bin</code> появится в папке проекта.<br><br>
+
+                <b class="text-green">PlatformIO:</b><br>
+                1. <code>pio run</code> — сборка.<br>
+                2. Файл: <code>.pio/build/esp32dev/firmware.bin</code>.<br><br>
+
+                <b class="text-green">Загрузка:</b><br>
+                1. Выбрать <code>.bin</code> файл выше.<br>
+                2. Нажать <b>«ЗАГРУЗИТЬ ПРОШИВКУ»</b>.<br>
+                3. Дождаться 100% — ESP перезагрузится автоматически.<br><br>
+
+                <b class="text-orange">Размер:</b> прошивка должна быть
+                меньше свободного места на flash (обычно ~1.5 MB для ESP32
+                с OTA). Если больше — выбери раздел побольше в Arduino IDE:
+                <b>Tools → Partition Scheme → Minimal SPIFFS (Large APP)</b>.
+
+            </div>
+        </section>
+
+    </div>
+
+</main>
+
+<footer class="footer">
+    <span class="footer__heart">♥</span> by KTH-Studio
+</footer>
+
+<script src="script.js"></script>
+<script>
+'use strict';
+
+//  Состояние
+let otaFile = null;
+let otaXHR  = null;
+let otaStartTime = 0;
+let otaUploadedBytes = 0;
+
+//  Загрузка информации о текущей прошивке
+async function loadFirmwareInfo() {
+    const r = await PCM.apiGet('/api/status');
+    if (!r.ok) return;
+    const d = r.data;
+
+    PCM.setText('fw-name',    d.name || '--');
+    PCM.setText('fw-version', 'v.' + (d.fw || '--'));
+    PCM.setText('fw-author',  d.author || '--');
+    PCM.setText('fw-uptime',  PCM.fmtUptime(d.uptime));
+    PCM.setText('fw-heap',    d.heap ? Math.round(d.heap / 1024) + ' KB' : '--');
+
+    // Flash и CPU из дополнительных полей (если есть)
+    if (d.flash_size) {
+        PCM.setText('fw-flash', Math.round(d.flash_size / 1024 / 1024 * 10) / 10 + ' MB');
+    } else {
+        PCM.setText('fw-flash', '--');
+    }
+
+    if (d.cpu_freq) {
+        PCM.setText('fw-cpu', d.cpu_freq + ' MHz');
+    } else {
+        PCM.setText('fw-cpu', '--');
+    }
+}
+
+//  Обработка выбора файла
+function onFileSelected(e) {
+    const file = e.target.files?.[0];
+    const btn = document.getElementById('btn-ota-upload');
+
+    if (!file) {
+        otaFile = null;
+        btn.disabled = true;
+        return;
+    }
+
+    if (!file.name.toLowerCase().endsWith('.bin')) {
+        PCM.showToast('✗ Файл должен быть .bin');
+        otaFile = null;
+        btn.disabled = true;
+        return;
+    }
+
+    otaFile = file;
+    btn.disabled = false;
+    PCM.showToast(`Выбран: ${file.name} (${formatSize(file.size)})`);
+}
+
+//  Загрузка
+function uploadOta() {
+    if (!otaFile) {
+        PCM.showToast('Файл не выбран');
+        return;
+    }
+
+    PCM.showConfirm(
+        'ЗАГРУЗКА ПРОШИВКИ',
+        `Файл: ${otaFile.name} (${formatSize(otaFile.size)}). Продолжить? ESP32 перезагрузится.`,
+        () => doUpload()
+    );
+}
+
+function doUpload() {
+    const formData = new FormData();
+    formData.append('firmware', otaFile, otaFile.name);
+
+    const xhr = new XMLHttpRequest();
+    otaXHR = xhr;
+    otaStartTime = Date.now();
+    otaUploadedBytes = 0;
+
+    // Показать прогресс
+    document.getElementById('ota-progress').classList.remove('hidden');
+    document.getElementById('btn-ota-upload').disabled = true;
+    document.getElementById('btn-ota-cancel').disabled = false;
+    updateProgress(0, otaFile.size, 'загрузка...');
+
+    xhr.upload.onprogress = (evt) => {
+        if (!evt.lengthComputable) return;
+        otaUploadedBytes = evt.loaded;
+        updateProgress(evt.loaded, evt.total, 'загрузка...');
+    };
+
+    xhr.onload = () => {
+        document.getElementById('btn-ota-cancel').disabled = true;
+
+        if (xhr.status === 200) {
+            updateProgress(otaFile.size, otaFile.size, '✓ Готово, ESP перезагружается...');
+            PCM.showToast('✓ Прошивка загружена. ESP перезагружается...');
+            setTimeout(() => {
+                PCM.showToast('Соединение потеряется. Обновите страницу через 10 сек.');
+            }, 2000);
+        } else {
+            updateProgress(otaUploadedBytes, otaFile.size, '✗ Ошибка: ' + xhr.status);
+            PCM.showToast('✗ Ошибка загрузки: ' + xhr.status);
+            document.getElementById('btn-ota-upload').disabled = false;
+        }
+    };
+
+    xhr.onerror = () => {
+        updateProgress(otaUploadedBytes, otaFile.size, '✗ Ошибка сети');
+        PCM.showToast('✗ Ошибка сети');
+        document.getElementById('btn-ota-upload').disabled = false;
+        document.getElementById('btn-ota-cancel').disabled = true;
+    };
+
+    xhr.onabort = () => {
+        document.getElementById('ota-progress').classList.add('hidden');
+        document.getElementById('btn-ota-upload').disabled = false;
+        document.getElementById('btn-ota-cancel').disabled = true;
+        PCM.showToast('Загрузка отменена');
+    };
+
+    xhr.open('POST', '/api/ota', true);
+    xhr.send(formData);
+}
+
+//  Обновление прогресс-бара
+function updateProgress(loaded, total, statusText) {
+    const pct = total > 0 ? Math.round(loaded * 100 / total) : 0;
+    const bar = document.getElementById('ota-bar');
+
+    bar.style.width = pct + '%';
+    bar.textContent = pct + '%';
+    bar.style.textAlign = 'center';
+    bar.style.color = '#000';
+    bar.style.lineHeight = '18px';
+    bar.style.fontSize = '12px';
+
+    PCM.setText('ota-percent', pct + '%');
+    PCM.setText('ota-status', statusText);
+
+    PCM.setText('ota-bytes',
+        `${formatSize(loaded)} / ${formatSize(total)}`);
+
+    // Скорость
+    const elapsed = (Date.now() - otaStartTime) / 1000;
+    if (elapsed > 0.5) {
+        const speed = loaded / 1024 / elapsed;
+        PCM.setText('ota-speed', Math.round(speed) + ' KB/s');
+    }
+}
+
+//  Отмена
+function cancelOta() {
+    if (otaXHR) {
+        otaXHR.abort();
+        otaXHR = null;
+    }
+}
+
+//  Утилиты
+function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+}
+
+//  Инициализация
+document.addEventListener('DOMContentLoaded', () => {
+    loadFirmwareInfo();
+    setInterval(loadFirmwareInfo, 5000);
+
+    document.getElementById('ota-file').addEventListener('change', onFileSelected);
+    document.getElementById('btn-ota-upload').onclick = uploadOta;
+    document.getElementById('btn-ota-cancel').onclick = cancelOta;
+
+    // Защита от случайного ухода во время загрузки
+    window.addEventListener('beforeunload', (e) => {
+        if (otaXHR && otaXHR.readyState === 1) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+});
+</script>
+
+</body>
+</html>
