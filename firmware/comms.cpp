@@ -48,13 +48,6 @@ uint32_t    comms_last_rx_ms() { return lastRxMs; }
 //  Парсинг JSON
  
 static void parse_json(const char* json, size_t len) {
-        // ===== Время с ПК =====
-    if (doc["time"].is<uint32_t>()) {
-        extern void clock_set_from_pc(uint32_t, int8_t);
-        uint32_t t = doc["time"];
-        int8_t tz  = doc["tz"] | 3;
-        clock_set_from_pc(t, tz);
-    }
     
     // Динамический документ (большой пакет)
     JsonDocument doc;
@@ -251,11 +244,11 @@ static void parse_json(const char* json, size_t len) {
     //  Команды на ESP (с веба ПК, если нужно) 
     // (опционально)
 
-    // ===== Время с ПК =====
+        // ===== Время с ПК =====
     if (doc["time"].is<uint32_t>()) {
         extern void clock_set_from_pc(uint32_t, int8_t);
         uint32_t t = doc["time"];
-        int8_t   tz = doc["tz"] | 3;
+        int8_t tz  = doc["tz"] | 3;
         clock_set_from_pc(t, tz);
     }
 

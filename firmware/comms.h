@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include "config.h"
 #include "overlays.h"
+#include "lang.h" 
 
 //  Связь с ПК (приём данных + отправка команд)
 

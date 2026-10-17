@@ -337,7 +337,7 @@ static void render_power(U8G2* u) {
     bool found = false;
     for (uint8_t b = 0; b < NUM_BUTTONS && !found; b++) {
         for (uint8_t t = 0; t < PRESS_COUNT; t++) {
-            if (settings_get_button(b, t) == ACT_POWER_CANCEL) {
+            if (settings_get_button(b, (PressType)t) == ACT_POWER_CANCEL) {
                 cancelBtn = b + 1;
                 found = true;
                 break;

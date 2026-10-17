@@ -1,10 +1,10 @@
 #pragma once
 
-//  PC Monitor v.5.0 by KTH-Studio
+//  PC Monitor v.5.1 by KTH-Studio
 
 //  ВЕРСИЯ 
 #define FW_NAME      "PC Monitor"
-#define FW_VERSION   "5.0"
+#define FW_VERSION   "5.1"
 #define FW_AUTHOR    "KTH-Studio"
 
 //  ПИНЫ — КНОПКИ 

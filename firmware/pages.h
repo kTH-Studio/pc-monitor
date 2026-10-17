@@ -1,6 +1,7 @@
 #pragma once
 #include <Arduino.h>
 #include "config.h"
+#include <U8G2lib.h> 
 
 //  ID страниц (порядок в NVS может быть другим!)
 
@@ -83,7 +84,8 @@ struct NetData {
     uint8_t  channelLoad;  // % (для LED)
 };
 
-struct PingTarget {
+// Результат пинга (name + ms). НЕ путать с PingTarget из settings.h (name + host).
+struct PingResult {
     char     name[24];
     uint16_t ms;
 };
@@ -91,7 +93,7 @@ struct PingTarget {
 struct PingData {
     bool     present;
     uint8_t  count;
-    PingTarget targets[5];
+    PingResult targets[5];    // было PingTarget
     uint16_t avgMs;
 };
 

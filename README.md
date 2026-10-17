@@ -75,7 +75,6 @@
 - [U8g2](https://github.com/olikraus/U8g2_Arduino/releases)
 - [Adafruit BME280 Library](https://github.com/adafruit/Adafruit_BME280_Library/releases)
 - [Adafruit Unified Sensor](https://github.com/adafruit/Adafruit_Sensor/releases)
-- [ArduinoJson 7.x](https://github.com/bblanchon/ArduinoJson/releases)
 - [ESPAsyncWebServer](https://github.com/ESP32Async/ESPAsyncWebServer)
 - [AsyncTCP](https://github.com/ESP32Async/AsyncTCP)
 

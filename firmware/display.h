@@ -32,11 +32,11 @@ void display_logo_show();
 
 // Большой экран
 #define FONT_BIG_TITLE   u8g2_font_7x13_t_cyrillic
-#define FONT_BIG_NORMAL  u8g2_font_6x10_t_cyrillic
+#define FONT_BIG_NORMAL  u8g2_font_6x12_t_cyrillic
 #define FONT_BIG_SMALL   u8g2_font_5x7_t_cyrillic
 #define FONT_BIG_LARGE   u8g2_font_10x20_t_cyrillic
-#define FONT_BIG_HUGE    u8g2_font_logisoso20_t_cyrillic
+#define FONT_BIG_HUGE    u8g2_font_helvB18_t_cyrillic
 
-// Малый экран (всё мелкое, чтобы 4 строки влезли в 32px)
+// Малый экран
 #define FONT_SMALL       u8g2_font_5x7_t_cyrillic
-#define FONT_SMALL_BOLD  u8g2_font_6x10_t_cyrillic
+#define FONT_SMALL_BOLD  u8g2_font_6x12_t_cyrillic

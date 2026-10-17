@@ -401,7 +401,7 @@ uint8_t sym_fraction(U8G2* u, int x, int y, uint8_t size,
 //  ВЕРХНИЕ ИНДЕКСЫ
 uint8_t sym_superscript(U8G2* u, int x, int y, uint8_t size, char ch) {
     // Уменьшенный шрифт для верхнего индекса
-    u->setFont(u8g2_font_4x6_t_cyrillic);
+    u->setFont(u8g2_font_4x6_tf);           // 4×6 без кириллицы (для ⁰¹²³... и ⁿ)
     char buf[2] = { ch, 0 };
     u->drawStr(x, y + 5, buf);
     return 5;

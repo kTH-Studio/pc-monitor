@@ -1,4 +1,5 @@
 #include "display.h"
+#include <Wire.h>
 #include "lang.h"
 
 //  Объекты U8g2
@@ -212,16 +213,14 @@ static void boot_mark(const char* name, bool ok) {
 }
 
 // Публичные функции для отметки из других модулей
-extern "C" {
-    void boot_check_oled64(bool ok)  { boot_mark("OLED64",  ok); }
-    void boot_check_oled32(bool ok)  { boot_mark("OLED32",  ok); }
-    void boot_check_bme(bool ok)     { boot_mark("BME280",  ok); }
-    void boot_check_ldr(bool ok)     { boot_mark("LDR",     ok); }
-    void boot_check_btns(bool ok)    { boot_mark("BTN x5",  ok); }
-    void boot_check_leds(bool ok)    { boot_mark("LED x5",  ok); }
-    void boot_check_wifi(bool ok)    { boot_mark("WiFi",    ok); }
-    void boot_check_web(bool ok)     { boot_mark("Web",     ok); }
-}
+void boot_check_oled64(bool ok)  { boot_mark("OLED64",  ok); }
+void boot_check_oled32(bool ok)  { boot_mark("OLED32",  ok); }
+void boot_check_bme(bool ok)     { boot_mark("BME280",  ok); }
+void boot_check_ldr(bool ok)     { boot_mark("LDR",     ok); }
+void boot_check_btns(bool ok)    { boot_mark("BTN x5",  ok); }
+void boot_check_leds(bool ok)    { boot_mark("LED x5",  ok); }
+void boot_check_wifi(bool ok)    { boot_mark("WiFi",    ok); }
+void boot_check_web(bool ok)     { boot_mark("Web",     ok); }
 
 bool display_boot_done() {
     for (uint8_t i = 0; i < BOOT_CHECKS_COUNT; i++) {
@@ -233,7 +232,7 @@ bool display_boot_done() {
 //  BOOT — логотип
 
 // Логотип — XBM-массив 128×64 (заглушка, заменишь своим)
-static const uint8_t LOGO_BITS[] PROGMEM = {
+static const uint8_t LOGO_BITS[1024] PROGMEM = {
     const uint8_t LOGO_BITS [] = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
