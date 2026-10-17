@@ -68,20 +68,20 @@
 
 ### Прошивка ESP32 (Arduino IDE)
 
-**1. Установи Arduino IDE 2.x и ESP32 Board Manager.**
+**1. Установи [Arduino IDE 2.x](https://www.arduino.cc/en/software) и настрой ESP32 Board Manager по [инструкции](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html).**
 
-**2. Установи библиотеки** (Library Manager):
+**2. Установи библиотеки** (через Library Manager или по ссылкам):
 
-- `U8g2` by oliver
-- `Adafruit BME280 Library`
-- `Adafruit Unified Sensor`
-- `ArduinoJson` (7.x)
-- `ESPAsyncWebServer` by me-no-dev
-- `AsyncTCP` by me-no-dev
+- [U8g2](https://github.com/olikraus/U8g2_Arduino/releases)
+- [Adafruit BME280 Library](https://github.com/adafruit/Adafruit_BME280_Library/releases)
+- [Adafruit Unified Sensor](https://github.com/adafruit/Adafruit_Sensor/releases)
+- [ArduinoJson 7.x](https://github.com/bblanchon/ArduinoJson/releases)
+- [ESPAsyncWebServer](https://github.com/ESP32Async/ESPAsyncWebServer)
+- [AsyncTCP](https://github.com/ESP32Async/AsyncTCP)
 
-**3. Установи плагин arduino-littlefs-upload** для загрузки веб-файлов:
+**3. Установи плагин [arduino-littlefs-upload](https://github.com/earlephilhower/arduino-littlefs-upload/releases)** для загрузки веб-файлов в LittleFS:
 
-- Скачай: https://github.com/earlephilhower/arduino-littlefs-upload/releases
+- Скачай `.vsix` из раздела Releases.
 - Распакуй в:
   - Linux: `~/.arduino15/tools/`
   - Windows: `%LOCALAPPDATA%\Arduino15\tools\`
@@ -110,6 +110,10 @@ pio device monitor     # serial monitor
 
 ### Python на ПК
 
+**1. Установи [Python 3.11](https://www.python.org/downloads/release/python-3119/) (рекомендуемая версия).**
+
+**2. Установи зависимости:**
+
 ```bash
 cd pc
 python -m venv venv
@@ -118,12 +122,15 @@ pip install -r requirements.txt
 python main.py
 ```
 
+**Дополнительное ПО:**
+
+- **RTSS (RivaTuner Statistics Server)** — для сбора FPS: [скачать с Guru3D](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html)
+- **LibreHardwareMonitorLib.dll** — для датчиков GPU/CPU: [скачать с GitHub](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor/releases) (нужна только DLL, положи её рядом со скриптом `main.py`)
+
 **Требования:**
 
 - Windows 10 (1809+) или Windows 11
 - Python 3.8 – 3.11 (winsdk не работает на 3.12+)
-- **RTSS** (для FPS): https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html
-- **LibreHardwareMonitorLib.dll** рядом со скриптом: https://github.com/LibreHardwareMonitor/LibreHardwareMonitor/releases
 
 ---
 
@@ -192,15 +199,6 @@ WebSocket: `ws://<ip>/ws`
 
 ---
 
-## Скриншоты
-
-| | |
-|---|---|
-| ![Boot](docs/SCREENSHOTS/boot.png) | ![Dashboard](docs/SCREENSHOTS/dashboard.png) |
-| ![OLED](docs/SCREENSHOTS/oled.png) | ![Web](docs/SCREENSHOTS/web.png) |
-
----
-
 ## Разработка
 
 ```bash
@@ -215,12 +213,6 @@ cd pc && python -u main.py
 
 ---
 
-## Вклад
-
-См. [CONTRIBUTING.md](CONTRIBUTING.md).
-
----
-
 ## Лицензия
 
 MIT — см. [LICENSE](LICENSE).
@@ -230,12 +222,3 @@ MIT — см. [LICENSE](LICENSE).
 ## Автор
 
 **KTH-Studio** ♥
-
----
-
-## Благодарности
-
-- [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor)
-- [U8g2](https://github.com/olikraus/u8g2)
-- [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)
-- [RivaTuner Statistics Server](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html)
