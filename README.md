@@ -1,4 +1,4 @@
-# PC Monitor v.5.0
+# PC Monitor v.5.1
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-5.0.0-brightgreen.svg)](CHANGELOG.md)
