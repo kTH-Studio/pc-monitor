@@ -2,6 +2,49 @@
 
 Все значимые изменения проекта.  
 
+## [5.1.1] — 2026-10-17
+
+Хотфикс после первой сборки v5.1: устранены оставшиеся ошибки компиляции, связанные с логотипом и несуществующим шрифтом U8g2.
+
+### Исправлено
+
+#### Логотип
+- **`display.cpp`** — удалён вложенный дубликат `LOGO_BITS` (был и глобальный `PROGMEM`, и локальный внутри `display_logo_show()` — компилятор выдавал `expected primary-expression before 'const'`). Теперь один массив: `static const uint8_t LOGO_BITS[1024] PROGMEM`.
+- **`display.cpp`** — в `display_logo_show()` раскомментирован вызов `u8g2_big.drawXBMP(0, 0, 128, 64, LOGO_BITS)`.
+
+#### Шрифты U8g2
+- **`display.h`** — `u8g2_font_helvB18_t_cyrillic` **не существует** в текущей версии U8g2 (ошибка `'u8g2_font_helvB18_t_cyrillic' was not declared`). Заменён на проверенный `u8g2_font_10x20_t_cyrillic`.
+- **`display.h`** — `FONT_BIG_LARGE` понижен с `10x20` на `9x15`, чтобы сохранить иерархию размеров:
+  - `SMALL` — `5x7` (7 px)
+  - `NORMAL` — `6x12` (12 px)
+  - `LARGE` — `9x15` (15 px)
+  - `HUGE` — `10x20` (20 px, крупные цифры на GPU/CPU/RAM)
+
+### Добавлено
+
+- **`tools/logo_to_c.py`** — скрипт конвертации PNG 128×64 в C-массив `LOGO_BITS`. Установка: `pip install pillow`, запуск: `python tools/logo_to_c.py docs/LOGO/logo.png`.
+- **`docs/LOGO.md`** — инструкция по созданию логотипа:
+  - через онлайн-конвертер [image2cpp](https://javl.github.io/image2cpp/)
+  - через Python-скрипт (офлайн)
+  - через графредактор (Piskel, GIMP, Photoshop)
+- **`docs/LOGO/logo-example.png`** — пример логотипа 128×64 (сердце).
+
+### Изменено
+
+- **`config.h`** — `FW_VERSION` → `"5.1"` (было `"5.0"`).
+- **`README.md`** — раздел «Логотип» со ссылкой на `docs/LOGO.md`.
+
+### Совместимость
+
+Без изменений относительно 5.1.0.
+
+### Известные ограничения
+
+- Готовый пример-логотип (сердце) в `display.cpp` собран вручную и может иметь смещения пикселей. Для точного результата используйте `tools/logo_to_c.py` или image2cpp со своим PNG.
+- `u8g2_font_10x20_t_cyrillic` занимает ~5 KB Flash. Если не хватает — заменить на `u8g2_font_9x15_t_cyrillic`.
+
+---
+
 ## [5.1.0] — 2026-10-17
 
 Патч совместимости: исправления компиляции под ESP32 Core 3.x и Arduino IDE 1.8.19, чистка дубликатов, корректные шрифты U8g2 с кириллицей.

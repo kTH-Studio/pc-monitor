@@ -4,7 +4,7 @@
 
 //  ВЕРСИЯ 
 #define FW_NAME      "PC Monitor"
-#define FW_VERSION   "5.1"
+#define FW_VERSION   "5.1.1"
 #define FW_AUTHOR    "KTH-Studio"
 
 //  ПИНЫ — КНОПКИ 
