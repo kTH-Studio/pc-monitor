@@ -21,12 +21,11 @@ static size_t rxLen = 0;
 
  
 //  Инициализация
- 
+static bool tcpStarted = false;
+
 void comms_init() {
     Serial.begin(SERIAL_BAUD);
-    tcpServer.begin();
-    tcpServer.setNoDelay(true);
-    Serial.printf("[COMMS] TCP server on port %d\n", COMMS_PORT);
+    // TCP-сервер стартует в comms_update(), когда WiFi готов
 }
 
  
@@ -331,18 +330,23 @@ void comms_handle_http_body(const uint8_t* data, size_t len) {
 
  
 //  Общий апдейт
- 
 void comms_update() {
+    // Стартуем TCP-сервер, когда WiFi активен
+    if (!tcpStarted && (WiFi.status() == WL_CONNECTED || WiFi.getMode() == WIFI_AP)) {
+        tcpServer.begin();
+        tcpServer.setNoDelay(true);
+        tcpStarted = true;
+        Serial.printf("[COMMS] TCP server started on port %d\n", COMMS_PORT);
+    }
+
     poll_serial();
     poll_tcp();
 
-    // Проверка таймаута
     if (linked && (millis() - lastRxMs > DATA_TIMEOUT_MS)) {
         linked = false;
         Serial.println("[COMMS] link lost");
     }
 }
-
  
 //  Отправка команд на ПК
  

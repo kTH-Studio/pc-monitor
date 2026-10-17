@@ -2,6 +2,48 @@
 
 Все значимые изменения проекта.  
 
+## [5.1.2] — 2026-10-17
+
+Хотфикс циклического ребута после инициализации BME280 (boot-loop). Устранён `assert failed: xQueueSemaphoreTake queue.c:1709 (( pxQueue ))`.
+
+### Исправлено
+
+#### Boot-loop при старте
+- **`PC_Monitor.ino`** — изменён порядок инициализации в `setup()`:
+  - Было: `comms_init()` → `webserver_init()`
+  - Стало: `webserver_init()` → `comms_init()`
+  - Причина: `WiFiServer::begin()` в `comms_init()` требовал уже инициализированного WiFi-стека. На ESP32 Core 3.x обращение к несозданному семафору FreeRTOS вызывало панику и ребут.
+- **`comms.cpp`** — запуск TCP-сервера отложен до момента, когда WiFi точно активен:
+  - `tcpServer.begin()` и `tcpServer.setNoDelay(true)` убраны из `comms_init()`.
+  - Добавлен флаг `tcpStarted` и проверка в `comms_update()`:
+
+```cpp
+if (!tcpStarted && (WiFi.status() == WL_CONNECTED || WiFi.getMode() == WIFI_AP)) {
+    tcpServer.begin();
+    tcpServer.setNoDelay(true);
+    tcpStarted = true;
+    Serial.printf("[COMMS] TCP server started on port %d\n", COMMS_PORT);
+}
+```
+
+  - Теперь TCP-сервер стартует только после успешного `webserver_init()` (STA или AP).
+
+### Изменено
+
+- **`comms.cpp`** — добавлен `#include <WiFi.h>` (требуется для проверки `WiFi.status()` в `comms_update()`).
+- **`comms.cpp`** — лог `[COMMS] TCP server on port 8888` перенесён из `comms_init()` в `comms_update()` (печатается при фактическом старте сервера).
+
+### Совместимость
+
+Без изменений. Патч работает и на ESP32 Core 2.x, и на 3.x.
+
+### Известные ограничения
+
+- Если `webserver_init()` переходит в AP-режим (WiFi не настроен), TCP-сервер всё равно стартует — ESP будет доступен по `192.168.4.1:8888`.
+- При переподключении к другой сети (сброс WiFi) TCP-сервер **не перезапускается** — требуется ребут. В будущих версиях можно добавить обработку `WiFi.onEvent(WIFI_EVENT_STA_DISCONNECTED)`.
+
+---
+
 ## [5.1.1] — 2026-10-17
 
 Хотфикс после первой сборки v5.1: устранены оставшиеся ошибки компиляции, связанные с логотипом и несуществующим шрифтом U8g2.

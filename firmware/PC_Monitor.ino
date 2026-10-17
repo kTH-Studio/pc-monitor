@@ -177,9 +177,9 @@ void setup() {
     bootStart = millis();
     sysState  = ST_BOOT_INIT;
 
-    // 4. Связь + веб + часы
-    comms_init();
-    webserver_init();
+        // 4. Веб + связь + часы (порядок важен!)
+    webserver_init();   // WiFi + HTTP + WS + OTA
+    comms_init();       // TCP-сервер (WiFi уже готов)
     clock_init();
 
     // Установить яркость из настроек
